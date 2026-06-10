@@ -238,45 +238,48 @@ function App() {
     <main className="min-h-screen bg-[#FAF7F2] text-stone-900 font-sans selection:bg-stone-200 antialiased pb-20 relative overflow-x-hidden">
       <Toaster position="bottom-right" richColors />
       
-      {/* 1. Header (Desktop Layout) */}
-      <header className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between border-b border-stone-200/60 sticky top-0 bg-[#FAF7F2]/90 backdrop-blur-md z-40">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="Luce by Lucy Logo" className="h-12 md:h-14 w-auto object-contain" />
-        </div>
+      {/* Hero Wrapper at the very top of the page */}
+      <div className="relative bg-[#FAF7F2] border-b border-stone-250/20">
+        
+        {/* 1. Header (Overlay Layout) */}
+        <header className="absolute top-0 left-0 right-0 max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between z-40 bg-transparent">
+          <div className="flex items-center">
+            <img src="/logo.png" alt="Luce by Lucy Logo" className="h-12 md:h-14 w-auto object-contain" />
+          </div>
 
-        <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] font-semibold text-stone-500 uppercase">
-          <a href="#home" className="text-stone-900 font-bold border-b-2 border-stone-900 pb-1 translate-y-0.5">Home</a>
-          <a href="#shop" className="hover:text-stone-900 transition-colors">Shop</a>
-          <a href="#collections" className="hover:text-stone-900 transition-colors">Collections</a>
-          <a href="#new-arrivals" className="hover:text-stone-900 transition-colors">New Arrivals</a>
-          <a href="#about" className="hover:text-stone-900 transition-colors">About Us</a>
-          <a href="#contact" className="hover:text-stone-900 transition-colors">Contact</a>
-        </nav>
+          <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] font-semibold text-stone-500 uppercase">
+            <a href="#home" className="text-stone-900 font-bold border-b-2 border-stone-900 pb-1 translate-y-0.5">Home</a>
+            <a href="#shop" className="hover:text-stone-900 transition-colors">Shop</a>
+            <a href="#collections" className="hover:text-stone-900 transition-colors">Collections</a>
+            <a href="#new-arrivals" className="hover:text-stone-900 transition-colors">New Arrivals</a>
+            <a href="#about" className="hover:text-stone-900 transition-colors">About Us</a>
+            <a href="#contact" className="hover:text-stone-900 transition-colors">Contact</a>
+          </nav>
 
-        <div className="flex items-center gap-6 text-stone-700">
-          <button aria-label="Search" className="hover:text-stone-900 transition-colors">
-            <Search size={20} strokeWidth={1.5} />
-          </button>
-          <button aria-label="User Account" className="hover:text-stone-900 transition-colors">
-            <User size={20} strokeWidth={1.5} />
-          </button>
-          <button 
-            aria-label="Shopping Bag" 
-            className="relative hover:text-stone-900 transition-colors" 
-            onClick={() => setIsCartOpen(true)}
-          >
-            <ShoppingBag size={20} strokeWidth={1.5} />
-            {getCartCount() > 0 && (
-              <span className="absolute -top-2 -right-2 bg-stone-900 text-[#FAF7F2] font-sans font-bold text-[9px] w-[18px] h-[18px] rounded-full flex items-center justify-center scale-90 animate-fade-in">
-                {getCartCount()}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
+          <div className="flex items-center gap-6 text-stone-700">
+            <button aria-label="Search" className="hover:text-stone-900 transition-colors">
+              <Search size={20} strokeWidth={1.5} />
+            </button>
+            <button aria-label="User Account" className="hover:text-stone-900 transition-colors">
+              <User size={20} strokeWidth={1.5} />
+            </button>
+            <button 
+              aria-label="Shopping Bag" 
+              className="relative hover:text-stone-900 transition-colors" 
+              onClick={() => setIsCartOpen(true)}
+            >
+              <ShoppingBag size={20} strokeWidth={1.5} />
+              {getCartCount() > 0 && (
+                <span className="absolute -top-2 -right-2 bg-stone-900 text-[#FAF7F2] font-sans font-bold text-[9px] w-[18px] h-[18px] rounded-full flex items-center justify-center scale-90 animate-fade-in">
+                  {getCartCount()}
+                </span>
+              )}
+            </button>
+          </div>
+        </header>
 
-      {/* 2. Hero Section (Slider Layout) */}
-      <section id="home" className="max-w-7xl mx-auto px-6 md:px-12 pt-8 md:pt-16 pb-16 min-h-[550px] lg:min-h-[620px] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        {/* 2. Hero Section (Slider Layout) */}
+        <section id="home" className="max-w-7xl mx-auto px-6 md:px-12 pt-28 md:pt-36 pb-16 min-h-[580px] lg:min-h-[660px] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
         
         {/* Hero Left Content (Animated on key changes) */}
         <div key={`left-${currentSlide}`} className="animate-fade-in lg:col-span-5 flex flex-col justify-center text-left">
@@ -391,6 +394,7 @@ function App() {
 
         </div>
       </section>
+    </div>
 
       {/* 3. New Arrivals & Editorial Grid */}
       <section id="new-arrivals" className="max-w-7xl mx-auto px-6 md:px-12 py-16">
