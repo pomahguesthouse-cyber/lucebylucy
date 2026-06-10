@@ -874,6 +874,34 @@ function AdminPage() {
     toast.success(`Hero Slide #${id} updated and published!`);
   };
 
+  const handleSlideImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setSlideForm(prev => ({ ...prev, image: reader.result as string }));
+          toast.success("Local image uploaded successfully!");
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setProductForm(prev => ({ ...prev, image: reader.result as string }));
+          toast.success("Product image uploaded successfully!");
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Product Manager Handlers
   const handleAddProductClick = () => {
     setEditingProductId(null);
@@ -1247,6 +1275,16 @@ function AdminPage() {
                             placeholder="Enter image URL"
                           />
                         </div>
+
+                        <div className="flex flex-col gap-1.5 mt-2">
+                          <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Or Upload Local Image</label>
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={handleSlideImageUpload}
+                            className="text-[10px] font-semibold text-stone-600 w-full cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-900 file:text-white hover:file:bg-stone-850 file:cursor-pointer border border-stone-250 p-1.5 rounded-xl"
+                          />
+                        </div>
                       </div>
 
                       {/* form data column */}
@@ -1482,14 +1520,23 @@ function AdminPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Image URL *</label>
+                <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Image URL</label>
                 <input 
                   type="text" 
-                  required
                   value={productForm.image}
                   onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
                   className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full"
                   placeholder="Paste Unsplash image URL"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Or Upload Local Image</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={handleProductImageUpload}
+                  className="text-[10px] font-semibold text-stone-600 w-full cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-900 file:text-white hover:file:bg-stone-850 file:cursor-pointer border border-stone-250 p-1.5 rounded-xl"
                 />
               </div>
 
