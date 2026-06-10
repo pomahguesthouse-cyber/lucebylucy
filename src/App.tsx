@@ -84,31 +84,31 @@ const products = [
   }
 ];
 
-// Premium hero slides matching the brand aesthetic
+// Premium hero slides matching the new design layout (wide images)
 const heroSlides = [
   {
     id: 1,
-    eyebrow: "New Collection",
-    headline: "Elevate Your Style, Embrace Elegance.",
+    eyebrow: "Feel the Fashion",
+    headline: "Elevate Your Style!",
     description: "Discover timeless fashion pieces crafted for the modern woman.",
-    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1000&q=85",
-    trendingProduct: products[1] // Leather Handbag
+    image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1600&q=85",
+    trendingProduct: products[4] // Satin Dress
   },
   {
     id: 2,
-    eyebrow: "Summer Essentials",
-    headline: "Effortless Grace, Everyday Comfort.",
-    description: "Explore light linen blends and minimal silhouettes designed for warm days.",
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1000&q=85",
-    trendingProduct: products[4] // Satin Dress
+    eyebrow: "New Collection",
+    headline: "Embrace Elegance.",
+    description: "Indulge in tailored linen blazers, trousers, and refined silhouettes.",
+    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85",
+    trendingProduct: products[0] // Oversized Blazer
   },
   {
     id: 3,
     eyebrow: "Autumn Warmth",
-    headline: "Cozy Textures, Refined Details.",
-    description: "Indulge in soft knitted wool blends and structured outerwear.",
-    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1000&q=85",
-    trendingProduct: products[2] // Knitted Sweater
+    headline: "Refined Textures.",
+    description: "Discover cozy knitted cotton-wool blends and warm color palettes.",
+    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=85",
+    trendingProduct: products[1] // Leather Handbag
   }
 ];
 
@@ -238,10 +238,19 @@ function App() {
     <main className="min-h-screen bg-[#FAF7F2] text-stone-900 font-sans selection:bg-stone-200 antialiased pb-20 relative overflow-x-hidden">
       <Toaster position="bottom-right" richColors />
       
-      {/* Hero Wrapper at the very top of the page */}
-      <div className="relative bg-[#FAF7F2] border-b border-stone-250/20">
+      {/* Hero Wrapper: Full Width and Height spanning the very top of the page */}
+      <div className="relative w-full overflow-hidden border-b border-stone-250/20 h-[600px] lg:h-[720px]">
         
-        {/* 1. Header (Overlay Layout) */}
+        {/* Full-Width Background Images */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out"
+          style={{ backgroundImage: `url(${activeSlide.image})` }}
+        >
+          {/* Soft overlay gradient for text readability (solid warm cream on the left, fade to transparent on the right) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2]/95 via-[#FAF7F2]/50 md:from-[#FAF7F2]/90 md:via-[#FAF7F2]/30 to-transparent pointer-events-none" />
+        </div>
+
+        {/* 1. Header (Overlay Layout aligned with max-w-7xl) */}
         <header className="absolute top-0 left-0 right-0 max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between z-40 bg-transparent">
           <div className="flex items-center">
             <img src="/logo.png" alt="Luce by Lucy Logo" className="h-12 md:h-14 w-auto object-contain" />
@@ -250,15 +259,22 @@ function App() {
           <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] font-semibold text-stone-500 uppercase">
             <a href="#home" className="text-stone-900 font-bold border-b-2 border-stone-900 pb-1 translate-y-0.5">Home</a>
             <a href="#shop" className="hover:text-stone-900 transition-colors">Shop</a>
-            <a href="#collections" className="hover:text-stone-900 transition-colors">Collections</a>
-            <a href="#new-arrivals" className="hover:text-stone-900 transition-colors">New Arrivals</a>
-            <a href="#about" className="hover:text-stone-900 transition-colors">About Us</a>
-            <a href="#contact" className="hover:text-stone-900 transition-colors">Contact</a>
+            <a href="#shape" className="hover:text-stone-900 transition-colors">Shape</a>
+            <a href="#product" className="hover:text-stone-900 transition-colors">Product</a>
+            <a href="#style" className="hover:text-stone-900 transition-colors">Style</a>
+            <a href="#blog" className="hover:text-stone-900 transition-colors">Blog</a>
           </nav>
 
           <div className="flex items-center gap-6 text-stone-700">
             <button aria-label="Search" className="hover:text-stone-900 transition-colors">
               <Search size={20} strokeWidth={1.5} />
+            </button>
+            <button 
+              onClick={() => toggleWishlist(activeSlide.trendingProduct.id, activeSlide.trendingProduct.name)}
+              aria-label="Wishlist" 
+              className="hover:text-stone-900 transition-colors"
+            >
+              <Heart size={20} strokeWidth={1.5} className={wishlist.includes(activeSlide.trendingProduct.id) ? "fill-red-500 stroke-red-500" : ""} />
             </button>
             <button aria-label="User Account" className="hover:text-stone-900 transition-colors">
               <User size={20} strokeWidth={1.5} />
@@ -278,123 +294,91 @@ function App() {
           </div>
         </header>
 
-        {/* 2. Hero Section (Slider Layout) */}
-        <section id="home" className="max-w-7xl mx-auto px-6 md:px-12 pt-28 md:pt-36 pb-16 min-h-[580px] lg:min-h-[660px] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-        
-        {/* Hero Left Content (Animated on key changes) */}
-        <div key={`left-${currentSlide}`} className="animate-fade-in lg:col-span-5 flex flex-col justify-center text-left">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-amber-800 uppercase mb-3 block">
-            {activeSlide.eyebrow}
-          </span>
-          <h1 className="font-serif text-5xl md:text-[66px] leading-[1.08] font-light text-stone-900 tracking-tight">
-            {activeSlide.headline.split(',')[0]},<br />{activeSlide.headline.split(',')[1]}
-          </h1>
-          <p className="text-stone-600 font-light mt-5 mb-8 text-base md:text-lg leading-relaxed max-w-md">
-            {activeSlide.description}
-          </p>
+        {/* 2. Hero Content (Centered grid content container) */}
+        <div className="relative max-w-7xl mx-auto px-6 md:px-12 h-full flex items-center z-10 w-full text-left pt-20">
+          <div key={currentSlide} className="animate-fade-in max-w-md md:max-w-xl">
+            <span className="text-[10px] tracking-[0.3em] font-bold text-amber-800 uppercase mb-3 block">
+              {activeSlide.eyebrow}
+            </span>
+            <h1 className="font-serif text-5xl md:text-[70px] leading-[1.08] font-light text-stone-900 tracking-tight mb-4">
+              {activeSlide.headline}
+            </h1>
+            <p className="text-stone-600 font-light text-base md:text-lg mb-8 max-w-md leading-relaxed">
+              {activeSlide.description}
+            </p>
 
-          <div className="flex items-center gap-4">
-            <a 
-              href="#shop"
-              className="pulse-btn bg-stone-900 text-stone-50 font-sans font-medium text-xs tracking-[0.2em] uppercase px-8 py-3.5 rounded-full hover:bg-stone-800 shadow-md hover:shadow-lg transition-all"
-            >
-              Shop Now
-            </a>
-            <a 
-              href="#new-arrivals"
-              className="border border-stone-300 text-stone-800 font-sans font-medium text-xs tracking-[0.2em] uppercase px-8 py-3.5 rounded-full hover:bg-stone-100/40 transition-all"
-            >
-              View Collection
-            </a>
-          </div>
-
-          {/* Hero Bottom Trust Badges (Compact) */}
-          <div className="border-t border-stone-200 mt-16 pt-6 grid grid-cols-3 gap-4 text-left">
-            <div className="flex flex-col">
-              <span className="font-bold text-[10px] tracking-wider uppercase text-stone-800">Free Shipping</span>
-              <span className="text-[9px] text-stone-500 font-light mt-0.5">On orders over $99</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-[10px] tracking-wider uppercase text-stone-800">Easy Returns</span>
-              <span className="text-[9px] text-stone-500 font-light mt-0.5">30-day return policy</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-[10px] tracking-wider uppercase text-stone-800">Secure Payment</span>
-              <span className="text-[9px] text-stone-500 font-light mt-0.5">100% secure checkout</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Hero Right Visuals (Animated on key changes) */}
-        <div key={`right-${currentSlide}`} className="animate-fade-in lg:col-span-7 relative flex justify-center lg:justify-end">
-          <div className="relative w-full max-w-lg lg:max-w-xl aspect-[4/5] overflow-hidden rounded-[40px] shadow-2xl group/slider">
-            <img 
-              src={activeSlide.image} 
-              alt={activeSlide.headline} 
-              className="w-full h-full object-cover object-top hover:scale-[1.02] transition-transform duration-700 ease-out"
-            />
-            
-            {/* Ambient Leaf shadows overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/10 via-transparent to-transparent pointer-events-none" />
-
-            {/* Slider Navigation Chevrons */}
-            <button 
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-stone-800 p-2.5 rounded-full shadow-md backdrop-blur-xs transition-colors z-20 cursor-pointer opacity-0 group-hover/slider:opacity-100 duration-300"
-              aria-label="Previous Slide"
-            >
-              <ChevronLeft size={18} strokeWidth={2.5} />
-            </button>
-            <button 
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-stone-800 p-2.5 rounded-full shadow-md backdrop-blur-xs transition-colors z-20 cursor-pointer opacity-0 group-hover/slider:opacity-100 duration-300"
-              aria-label="Next Slide"
-            >
-              <ChevronRight size={18} strokeWidth={2.5} />
-            </button>
-
-            {/* Dot indicators in bottom-center */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-              {heroSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    currentSlide === idx ? "bg-stone-900 w-5" : "bg-stone-900/40 w-1.5"
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Floating Trending Overlay Card */}
-          <div className="animate-float absolute bottom-8 left-4 md:left-8 bg-white/75 backdrop-blur-xl border border-white/40 p-4 rounded-3xl shadow-xl flex items-center gap-4 max-w-[270px] z-30">
-            <img 
-              src={activeSlide.trendingProduct.image} 
-              alt="Trending item" 
-              className="w-14 h-14 object-cover rounded-2xl bg-stone-100 shadow-inner"
-            />
-            <div className="text-left">
-              <span className="text-[8px] font-bold tracking-[0.2em] text-stone-400 uppercase block">Trending Now</span>
-              <h4 className="font-sans font-bold text-[11px] text-stone-800 truncate max-w-[130px]">
-                {activeSlide.trendingProduct.name}
-              </h4>
-              <p className="font-semibold text-[10px] text-stone-900 mt-0.5">
-                {activeSlide.trendingProduct.priceStr}
-              </p>
-              <button 
-                onClick={() => addToCart(activeSlide.trendingProduct)}
-                className="text-[9px] font-bold text-stone-800 hover:text-stone-900 flex items-center gap-1 mt-1 tracking-wider uppercase border-b border-stone-800/40 pb-0.5"
+            <div className="flex items-center gap-4">
+              <a 
+                href="#shop"
+                className="pulse-btn bg-[#A38D7D] text-white font-sans font-medium text-xs tracking-[0.2em] uppercase px-8 py-3.5 rounded-xl hover:bg-[#927E6E] shadow-md hover:shadow-lg transition-all"
               >
-                Quick Add <ArrowRight size={10} className="stroke-[2.5]" />
-              </button>
+                Shop Now
+              </a>
+              <a 
+                href="#new-arrivals"
+                className="border border-stone-300 text-stone-850 font-sans font-medium text-xs tracking-[0.2em] uppercase px-8 py-3.5 rounded-xl hover:bg-white/40 transition-all"
+              >
+                New Arrivals
+              </a>
             </div>
           </div>
-
         </div>
-      </section>
-    </div>
+
+        {/* Floating Trending Overlay Card in Bottom Right corner */}
+        <div key={`trending-${currentSlide}`} className="animate-fade-in animate-float absolute bottom-8 right-6 md:right-12 bg-white/75 backdrop-blur-xl border border-white/40 p-4 rounded-3xl shadow-xl flex items-center gap-4 max-w-[270px] z-30">
+          <img 
+            src={activeSlide.trendingProduct.image} 
+            alt="Trending item" 
+            className="w-14 h-14 object-cover rounded-2xl bg-stone-100 shadow-inner"
+          />
+          <div className="text-left">
+            <span className="text-[8px] font-bold tracking-[0.2em] text-stone-400 uppercase block">Trending Now</span>
+            <h4 className="font-sans font-bold text-[11px] text-stone-800 truncate max-w-[130px]">
+              {activeSlide.trendingProduct.name}
+            </h4>
+            <p className="font-semibold text-[10px] text-stone-900 mt-0.5">
+              {activeSlide.trendingProduct.priceStr}
+            </p>
+            <button 
+              onClick={() => addToCart(activeSlide.trendingProduct)}
+              className="text-[9px] font-bold text-stone-800 hover:text-stone-900 flex items-center gap-1 mt-1 tracking-wider uppercase border-b border-stone-800/40 pb-0.5"
+            >
+              Quick Add <ArrowRight size={10} className="stroke-[2.5]" />
+            </button>
+          </div>
+        </div>
+
+        {/* Slider Controls (Overlay Chevrons on far edges) */}
+        <button 
+          onClick={prevSlide}
+          className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-stone-800 p-2.5 rounded-full shadow-md backdrop-blur-xs transition-colors z-30 cursor-pointer"
+          aria-label="Previous Slide"
+        >
+          <ChevronLeft size={18} strokeWidth={2.5} />
+        </button>
+        <button 
+          onClick={nextSlide}
+          className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-stone-850 p-2.5 rounded-full shadow-md backdrop-blur-xs transition-colors z-30 cursor-pointer"
+          aria-label="Next Slide"
+        >
+          <ChevronRight size={18} strokeWidth={2.5} />
+        </button>
+
+        {/* Dot indicators in bottom-center */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+          {heroSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`h-1.5 rounded-full transition-all ${
+                currentSlide === idx ? "bg-stone-900 w-5" : "bg-stone-900/40 w-1.5"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+      </div>
 
       {/* 3. New Arrivals & Editorial Grid */}
       <section id="new-arrivals" className="max-w-7xl mx-auto px-6 md:px-12 py-16">
@@ -482,7 +466,7 @@ function App() {
       <section id="shop" className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-stone-200/50">
         <div className="flex flex-col text-left mb-10">
           <span className="text-[10px] tracking-[0.3em] font-bold text-stone-400 uppercase mb-1">Our Collection</span>
-          <h2 className="font-serif text-3xl font-light text-stone-900 tracking-tight">Shop the Catalog</h2>
+          <h2 className="font-serif text-3xl font-light text-stone-950 tracking-tight">Shop the Catalog</h2>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6">
