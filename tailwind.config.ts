@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'sans-serif'],
+        sans: ['Montserrat', 'DM Sans', 'sans-serif'],
+        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+        script: ['Great Vibes', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
