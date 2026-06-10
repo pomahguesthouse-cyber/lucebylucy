@@ -189,9 +189,8 @@ function App() {
       
       {/* 1. Header (Desktop Layout) */}
       <header className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between border-b border-stone-200/60 sticky top-0 bg-[#FAF7F2]/90 backdrop-blur-md z-40">
-        <div className="flex flex-col text-left">
-          <span className="font-serif text-2xl font-bold tracking-[0.18em] leading-tight">LUCE</span>
-          <span className="font-sans text-[9px] tracking-[0.35em] text-stone-500 font-semibold -mt-0.5">BY LUCY</span>
+        <div className="flex items-center">
+          <img src="/logo.png" alt="Luce by Lucy Logo" className="h-12 md:h-14 w-auto object-contain" />
         </div>
 
         <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] font-semibold text-stone-500 uppercase">
