@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
+import {
   Search,
   User,
   ShoppingBag,
@@ -16,12 +22,25 @@ import {
   ShoppingBag as BagIcon,
   ChevronLeft,
   ChevronRight,
+  LayoutDashboard,
+  Sliders,
+  Package,
+  LogOut,
+  Globe,
+  Settings,
+  PlusCircle,
+  Edit2,
+  Trash2,
+  Lock,
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import "./App.css";
 
-// Premium products data matching the warm aesthetic
-const products = [
+// ----------------------------------------------------
+// DEFAULT DATA SYSTEM
+// ----------------------------------------------------
+
+const defaultProducts = [
   {
     id: "oversized-blazer",
     name: "Oversized Blazer",
@@ -84,15 +103,14 @@ const products = [
   }
 ];
 
-// Premium hero slides matching the new design layout (wide images)
-const heroSlides = [
+const defaultSlides = [
   {
     id: 1,
     eyebrow: "Feel the Fashion",
     headline: "Elevate Your Style!",
     description: "Discover timeless fashion pieces crafted for the modern woman.",
     image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1600&q=85",
-    trendingProduct: products[4] // Satin Dress
+    trendingProductId: "satin-dress"
   },
   {
     id: 2,
@@ -100,7 +118,7 @@ const heroSlides = [
     headline: "Embrace Elegance.",
     description: "Indulge in tailored linen blazers, trousers, and refined silhouettes.",
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85",
-    trendingProduct: products[0] // Oversized Blazer
+    trendingProductId: "oversized-blazer"
   },
   {
     id: 3,
@@ -108,9 +126,44 @@ const heroSlides = [
     headline: "Refined Textures.",
     description: "Discover cozy knitted cotton-wool blends and warm color palettes.",
     image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=85",
-    trendingProduct: products[1] // Leather Handbag
+    trendingProductId: "leather-handbag"
   }
 ];
+
+// Helper functions for LocalStorage sync
+const loadProducts = () => {
+  const data = localStorage.getItem("luce_products");
+  if (data) return JSON.parse(data);
+  localStorage.setItem("luce_products", JSON.stringify(defaultProducts));
+  return defaultProducts;
+};
+
+const loadSlides = () => {
+  const data = localStorage.getItem("luce_slides");
+  if (data) return JSON.parse(data);
+  localStorage.setItem("luce_slides", JSON.stringify(defaultSlides));
+  return defaultSlides;
+};
+
+// ----------------------------------------------------
+// MAIN ROUTER ENTRY POINT
+// ----------------------------------------------------
+
+function App() {
+  return (
+    <Router>
+      <Toaster position="bottom-right" richColors />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </Router>
+  );
+}
+
+// ----------------------------------------------------
+// PUBLIC LANDING PAGE
+// ----------------------------------------------------
 
 interface CartItem {
   id: string;
@@ -122,75 +175,119 @@ interface CartItem {
   colorName: string;
 }
 
-function App() {
-  // Global cart, wishlist, and slide-over states
-  const [cart, setCart] = useState<CartItem[]>([
-    {
-      id: "oversized-blazer",
-      name: "Oversized Blazer",
-      price: 89.99,
-      image: products[0].image,
-      quantity: 1,
-      color: "#D4C5B9",
-      colorName: "Taupe"
-    },
-    {
-      id: "leather-handbag",
-      name: "Leather Handbag",
-      price: 99.99,
-      image: products[1].image,
-      quantity: 1,
-      color: "#8B5A2B",
-      colorName: "Brown"
-    }
-  ]);
-  const [wishlist, setWishlist] = useState<string[]>(["leather-handbag"]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+function LandingPage() {
+  // Sync products and slides from LocalStorage
+  const [productsList, setProductsList] = useState<typeof defaultProducts>([]);
+  const [slidesList, setSlidesList] = useState<typeof defaultSlides>([]);
 
-  // Hero Slider active index state
+  useEffect(() => {
+    setProductsList(loadProducts());
+    setSlidesList(loadSlides());
+  }, []);
+
+  // Cart & Wishlist state
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Initialize cart from localStorage if exists
+  useEffect(() => {
+    const cachedCart = localStorage.getItem("luce_cart");
+    if (cachedCart) {
+      setCart(JSON.parse(cachedCart));
+    } else if (productsList.length > 0) {
+      const initialCart = [
+        {
+          id: productsList[0].id,
+          name: productsList[0].name,
+          price: productsList[0].price,
+          image: productsList[0].image,
+          quantity: 1,
+          color: productsList[0].colors[0],
+          colorName: productsList[0].colorNames[0]
+        },
+        {
+          id: productsList[1].id,
+          name: productsList[1].name,
+          price: productsList[1].price,
+          image: productsList[1].image,
+          quantity: 1,
+          color: productsList[1].colors[0],
+          colorName: productsList[1].colorNames[0]
+        }
+      ];
+      setCart(initialCart);
+      localStorage.setItem("luce_cart", JSON.stringify(initialCart));
+    }
+  }, [productsList]);
+
+  // Wishlist cache
+  useEffect(() => {
+    const cachedWish = localStorage.getItem("luce_wishlist");
+    if (cachedWish) {
+      setWishlist(JSON.parse(cachedWish));
+    } else {
+      const initialWish = ["leather-handbag"];
+      setWishlist(initialWish);
+      localStorage.setItem("luce_wishlist", JSON.stringify(initialWish));
+    }
+  }, []);
+
+  // Save cart changes
+  const saveCart = (newCart: CartItem[]) => {
+    setCart(newCart);
+    localStorage.setItem("luce_cart", JSON.stringify(newCart));
+  };
 
   // Auto-play interval for hero slider
   useEffect(() => {
+    if (slidesList.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % slidesList.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slidesList]);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    if (slidesList.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % slidesList.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    if (slidesList.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + slidesList.length) % slidesList.length);
   };
 
   // Wishlist handler
   const toggleWishlist = (id: string, name: string) => {
+    let updated: string[];
     if (wishlist.includes(id)) {
-      setWishlist(wishlist.filter(item => item !== id));
+      updated = wishlist.filter(item => item !== id);
       toast.info(`Removed ${name} from your Wishlist`);
     } else {
-      setWishlist([...wishlist, id]);
+      updated = [...wishlist, id];
       toast.success(`Added ${name} to your Wishlist!`);
     }
+    setWishlist(updated);
+    localStorage.setItem("luce_wishlist", JSON.stringify(updated));
   };
 
   // Add to cart handler
-  const addToCart = (product: typeof products[0], colorCode?: string, colorName?: string, qty: number = 1) => {
+  const addToCart = (product: typeof defaultProducts[0], colorCode?: string, colorName?: string, qty: number = 1) => {
     const code = colorCode || product.colors[0];
     const name = colorName || product.colorNames[0];
 
     const existing = cart.find(item => item.id === product.id && item.color === code);
+    let updatedCart: CartItem[];
     if (existing) {
-      setCart(cart.map(item => 
+      updatedCart = cart.map(item => 
         (item.id === product.id && item.color === code)
           ? { ...item, quantity: item.quantity + qty }
           : item
-      ));
+      );
     } else {
-      setCart([...cart, {
+      updatedCart = [...cart, {
         id: product.id,
         name: product.name,
         price: product.price,
@@ -198,8 +295,9 @@ function App() {
         quantity: qty,
         color: code,
         colorName: name
-      }]);
+      }];
     }
+    saveCart(updatedCart);
     toast.success(`Added ${product.name} (${name}) to your Shopping Bag!`, {
       action: {
         label: "View Bag",
@@ -209,18 +307,20 @@ function App() {
   };
 
   const removeFromCart = (id: string, color: string, name: string) => {
-    setCart(cart.filter(item => !(item.id === id && item.color === color)));
+    const updated = cart.filter(item => !(item.id === id && item.color === color));
+    saveCart(updated);
     toast.info(`Removed ${name} from your Shopping Bag`);
   };
 
   const updateCartQty = (id: string, color: string, change: number) => {
-    setCart(cart.map(item => {
+    const updated = cart.map(item => {
       if (item.id === id && item.color === color) {
         const newQty = item.quantity + change;
         return { ...item, quantity: newQty < 1 ? 1 : newQty };
       }
       return item;
-    }));
+    });
+    saveCart(updated);
   };
 
   const getCartCount = () => cart.reduce((total, item) => total + item.quantity, 0);
@@ -228,15 +328,24 @@ function App() {
 
   const handleCheckout = () => {
     toast.success("Checkout simulation complete! Thank you for purchasing from Luce by Lucy.");
-    setCart([]);
+    saveCart([]);
     setIsCartOpen(false);
   };
 
-  const activeSlide = heroSlides[currentSlide];
+  if (productsList.length === 0 || slidesList.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-stone-300 border-t-stone-900 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const activeSlide = slidesList[currentSlide];
+  // Retrieve corresponding trending product for active slide
+  const activeTrendingProduct = productsList.find(p => p.id === activeSlide.trendingProductId) || productsList[0];
 
   return (
     <main className="min-h-screen bg-[#FAF7F2] text-stone-900 font-sans selection:bg-stone-200 antialiased pb-20 relative overflow-x-hidden">
-      <Toaster position="bottom-right" richColors />
       
       {/* Hero Wrapper: Full Width and Height spanning the very top of the page */}
       <div className="relative w-full overflow-hidden border-b border-stone-250/20 h-[600px] lg:h-[720px]">
@@ -270,15 +379,15 @@ function App() {
               <Search size={20} strokeWidth={1.5} />
             </button>
             <button 
-              onClick={() => toggleWishlist(activeSlide.trendingProduct.id, activeSlide.trendingProduct.name)}
+              onClick={() => toggleWishlist(activeTrendingProduct.id, activeTrendingProduct.name)}
               aria-label="Wishlist" 
               className="hover:text-stone-900 transition-colors"
             >
-              <Heart size={20} strokeWidth={1.5} className={wishlist.includes(activeSlide.trendingProduct.id) ? "fill-red-500 stroke-red-500" : ""} />
+              <Heart size={20} strokeWidth={1.5} className={wishlist.includes(activeTrendingProduct.id) ? "fill-red-500 stroke-red-500" : ""} />
             </button>
-            <button aria-label="User Account" className="hover:text-stone-900 transition-colors">
+            <Link to="/admin" aria-label="Admin Dashboard" className="hover:text-stone-900 transition-colors">
               <User size={20} strokeWidth={1.5} />
-            </button>
+            </Link>
             <button 
               aria-label="Shopping Bag" 
               className="relative hover:text-stone-900 transition-colors" 
@@ -310,7 +419,7 @@ function App() {
             <div className="flex items-center gap-4">
               <a 
                 href="#shop"
-                className="pulse-btn bg-[#A38D7D] text-white font-sans font-medium text-xs tracking-[0.2em] uppercase px-8 py-3.5 rounded-xl hover:bg-[#927E6E] shadow-md hover:shadow-lg transition-all"
+                className="pulse-btn bg-[#A38D7D] text-white font-sans font-medium text-xs tracking-[0.2em] uppercase px-8 py-3.5 rounded-xl hover:bg-[#927E6E] shadow-sm hover:shadow-md transition-all"
               >
                 Shop Now
               </a>
@@ -327,20 +436,20 @@ function App() {
         {/* Floating Trending Overlay Card in Bottom Right corner */}
         <div key={`trending-${currentSlide}`} className="animate-fade-in animate-float absolute bottom-8 right-6 md:right-12 bg-white/75 backdrop-blur-xl border border-white/40 p-4 rounded-3xl shadow-xl flex items-center gap-4 max-w-[270px] z-30">
           <img 
-            src={activeSlide.trendingProduct.image} 
+            src={activeTrendingProduct.image} 
             alt="Trending item" 
             className="w-14 h-14 object-cover rounded-2xl bg-stone-100 shadow-inner"
           />
           <div className="text-left">
             <span className="text-[8px] font-bold tracking-[0.2em] text-stone-400 uppercase block">Trending Now</span>
             <h4 className="font-sans font-bold text-[11px] text-stone-800 truncate max-w-[130px]">
-              {activeSlide.trendingProduct.name}
+              {activeTrendingProduct.name}
             </h4>
             <p className="font-semibold text-[10px] text-stone-900 mt-0.5">
-              {activeSlide.trendingProduct.priceStr}
+              ${activeTrendingProduct.price.toFixed(2)}
             </p>
             <button 
-              onClick={() => addToCart(activeSlide.trendingProduct)}
+              onClick={() => addToCart(activeTrendingProduct)}
               className="text-[9px] font-bold text-stone-800 hover:text-stone-900 flex items-center gap-1 mt-1 tracking-wider uppercase border-b border-stone-800/40 pb-0.5"
             >
               Quick Add <ArrowRight size={10} className="stroke-[2.5]" />
@@ -366,7 +475,7 @@ function App() {
 
         {/* Dot indicators in bottom-center */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
-          {heroSlides.map((_, idx) => (
+          {slidesList.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
@@ -400,7 +509,7 @@ function App() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
-              {products.slice(0, 4).map((product) => (
+              {productsList.slice(0, 4).map((product) => (
                 <div key={product.id} className="group flex flex-col text-left relative">
                   
                   {/* Heart Wishlist Trigger */}
@@ -437,7 +546,7 @@ function App() {
                     {product.name}
                   </h3>
                   <p className="font-sans text-xs text-stone-900 font-bold mt-0.5 px-1">
-                    {product.priceStr}
+                    ${product.price.toFixed(2)}
                   </p>
                 </div>
               ))}
@@ -466,11 +575,11 @@ function App() {
       <section id="shop" className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-stone-200/50">
         <div className="flex flex-col text-left mb-10">
           <span className="text-[10px] tracking-[0.3em] font-bold text-stone-400 uppercase mb-1">Our Collection</span>
-          <h2 className="font-serif text-3xl font-light text-stone-950 tracking-tight">Shop the Catalog</h2>
+          <h2 className="font-serif text-3xl font-light text-stone-955 tracking-tight">Shop the Catalog</h2>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6">
-          {products.map((product) => (
+          {productsList.map((product) => (
             <div key={product.id} className="group flex flex-col text-left relative">
               {/* Heart Wishlist Trigger */}
               <button 
@@ -506,7 +615,7 @@ function App() {
                 {product.name}
               </h3>
               <p className="font-sans text-xs text-stone-900 font-bold mt-0.5 px-1">
-                {product.priceStr}
+                ${product.price.toFixed(2)}
               </p>
             </div>
           ))}
@@ -551,13 +660,11 @@ function App() {
       {/* 6. Shopping Bag Slide-Over Drawer */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
-          {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-stone-900/40 backdrop-blur-xs transition-opacity"
             onClick={() => setIsCartOpen(false)}
           />
 
-          {/* Drawer content */}
           <div className="relative w-screen max-w-md bg-[#FAF7F2] shadow-2xl h-full flex flex-col justify-between z-10 animate-slide-in-right">
             <div className="px-6 py-6 border-b border-stone-200/60 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -575,7 +682,6 @@ function App() {
               </button>
             </div>
 
-            {/* Cart Items List */}
             <div className="flex-1 overflow-y-auto px-6 py-4 divide-y divide-stone-200/50">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-20">
@@ -629,7 +735,6 @@ function App() {
               )}
             </div>
 
-            {/* pricing footer */}
             {cart.length > 0 && (
               <div className="bg-stone-100/60 border-t border-stone-200/80 px-6 py-6">
                 <div className="flex justify-between text-xs font-semibold text-stone-500 uppercase tracking-wider">
@@ -659,6 +764,794 @@ function App() {
       )}
 
     </main>
+  );
+}
+
+// ----------------------------------------------------
+// BACKEND ADMIN PANELS
+// ----------------------------------------------------
+
+interface AdminUser {
+  name: string;
+  email: string;
+  avatar: string;
+}
+
+function AdminPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem("admin_logged_in") === "true");
+  const [user, setUser] = useState<AdminUser | null>(null);
+  
+  // Google sign in popup triggers
+  const [showGooglePopup, setShowGooglePopup] = useState(false);
+  const [googleStep, setGoogleStep] = useState(0); // 0: Choose Account, 1: Loading verification
+
+  // Navigation inside Admin Dashboard
+  const [activeTab, setActiveTab] = useState<"dashboard" | "slider" | "products">("slider");
+
+  // Local state for slide and product lists
+  const [slides, setSlides] = useState<typeof defaultSlides>([]);
+  const [products, setProducts] = useState<typeof defaultProducts>([]);
+
+  // Modals / Editors state
+  const [editingSlideId, setEditingSlideId] = useState<number | null>(null);
+  const [slideForm, setSlideForm] = useState({
+    eyebrow: "",
+    headline: "",
+    description: "",
+    image: "",
+    trendingProductId: ""
+  });
+
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [productForm, setProductForm] = useState({
+    name: "",
+    price: 0,
+    image: "",
+    description: "",
+    colorsStr: "",
+    colorNamesStr: ""
+  });
+
+  // Sync session and backend arrays
+  useEffect(() => {
+    if (isLoggedIn) {
+      setUser({
+        name: localStorage.getItem("admin_user_name") || "Lucy Admin",
+        email: localStorage.getItem("admin_user_email") || "admin@lucebylucy.online",
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80"
+      });
+      setSlides(loadSlides());
+      setProducts(loadProducts());
+    }
+  }, [isLoggedIn]);
+
+  // Google Login Handshake simulation
+  const handleGoogleLoginClick = () => {
+    setShowGooglePopup(true);
+    setGoogleStep(0);
+  };
+
+  const handleChooseAccount = (name: string, email: string) => {
+    setGoogleStep(1);
+    // Simulate API authorization wait
+    setTimeout(() => {
+      localStorage.setItem("admin_logged_in", "true");
+      localStorage.setItem("admin_user_name", name);
+      localStorage.setItem("admin_user_email", email);
+      setIsLoggedIn(true);
+      setShowGooglePopup(false);
+      toast.success(`Welcome back, ${name}! Signed in successfully via Google.`);
+    }, 1800);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_logged_in");
+    localStorage.removeItem("admin_user_name");
+    localStorage.removeItem("admin_user_email");
+    setIsLoggedIn(false);
+    setUser(null);
+    toast.info("Logged out successfully");
+  };
+
+  // Slider Editor Handlers
+  const handleEditSlide = (slide: typeof defaultSlides[0]) => {
+    setEditingSlideId(slide.id);
+    setSlideForm({
+      eyebrow: slide.eyebrow,
+      headline: slide.headline,
+      description: slide.description,
+      image: slide.image,
+      trendingProductId: slide.trendingProductId
+    });
+  };
+
+  const handleSaveSlide = (id: number) => {
+    const updated = slides.map(s => s.id === id ? { ...s, ...slideForm } : s);
+    setSlides(updated);
+    localStorage.setItem("luce_slides", JSON.stringify(updated));
+    setEditingSlideId(null);
+    toast.success(`Hero Slide #${id} updated and published!`);
+  };
+
+  // Product Manager Handlers
+  const handleAddProductClick = () => {
+    setEditingProductId(null);
+    setProductForm({
+      name: "",
+      price: 0,
+      image: "",
+      description: "",
+      colorsStr: "#A38D7D, #111111",
+      colorNamesStr: "Beige, Black"
+    });
+    setShowProductModal(true);
+  };
+
+  const handleEditProductClick = (p: typeof defaultProducts[0]) => {
+    setEditingProductId(p.id);
+    setProductForm({
+      name: p.name,
+      price: p.price,
+      image: p.image,
+      description: p.description,
+      colorsStr: p.colors.join(", "),
+      colorNamesStr: p.colorNames.join(", ")
+    });
+    setShowProductModal(true);
+  };
+
+  const handleSaveProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!productForm.name || !productForm.image) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    const colors = productForm.colorsStr.split(",").map(c => c.trim()).filter(Boolean);
+    const colorNames = productForm.colorNamesStr.split(",").map(c => c.trim()).filter(Boolean);
+
+    if (editingProductId) {
+      // Edit mode
+      const updated = products.map(p => p.id === editingProductId ? {
+        ...p,
+        name: productForm.name,
+        price: Number(productForm.price),
+        priceStr: `$${Number(productForm.price).toFixed(2)}`,
+        image: productForm.image,
+        description: productForm.description,
+        colors,
+        colorNames
+      } : p);
+      setProducts(updated);
+      localStorage.setItem("luce_products", JSON.stringify(updated));
+      toast.success("Product updated successfully!");
+    } else {
+      // Add mode
+      const newId = productForm.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const newProduct = {
+        id: newId,
+        name: productForm.name,
+        price: Number(productForm.price),
+        priceStr: `$${Number(productForm.price).toFixed(2)}`,
+        image: productForm.image,
+        description: productForm.description,
+        colors: colors.length > 0 ? colors : ["#FAF8F5"],
+        colorNames: colorNames.length > 0 ? colorNames : ["White"]
+      };
+      const updated = [...products, newProduct];
+      setProducts(updated);
+      localStorage.setItem("luce_products", JSON.stringify(updated));
+      toast.success("New product added to catalog!");
+    }
+    setShowProductModal(false);
+  };
+
+  const handleDeleteProduct = (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete "${name}" from the store catalog?`)) {
+      const updated = products.filter(p => p.id !== id);
+      setProducts(updated);
+      localStorage.setItem("luce_products", JSON.stringify(updated));
+      toast.info(`Product "${name}" deleted`);
+    }
+  };
+
+  // Render Login Panel
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-6 select-none relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-10 left-10 w-64 h-64 bg-amber-100/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-stone-200/50 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-md w-full bg-white border border-stone-200/80 rounded-[30px] p-8 shadow-xl relative z-10 text-center animate-fade-in">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-stone-900 flex items-center justify-center text-white mb-4 shadow-md">
+              <Lock size={28} className="stroke-[1.5]" />
+            </div>
+            <h1 className="font-serif text-3xl font-bold tracking-[0.05em] text-stone-900 leading-tight">LUCE BY LUCY</h1>
+            <span className="text-[10px] tracking-[0.2em] font-semibold text-stone-400 uppercase mt-1">Control Dashboard</span>
+          </div>
+
+          <p className="text-stone-500 font-light text-sm leading-relaxed mb-8">
+            Access to this administrative workspace is restricted. Please sign in with your store Google account credentials to proceed.
+          </p>
+
+          <button 
+            onClick={handleGoogleLoginClick}
+            className="w-full bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 font-sans font-semibold text-xs tracking-wider uppercase h-12 rounded-full flex items-center justify-center gap-3 active:scale-98 transition-all shadow-sm"
+          >
+            {/* Google Logo SVG */}
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+            </svg>
+            Sign In with Google
+          </button>
+
+          <div className="w-full h-[1px] bg-stone-200/50 my-6" />
+          
+          <Link to="/" className="text-[10px] font-bold text-stone-500 hover:text-stone-900 flex items-center justify-center gap-1.5 tracking-wider uppercase">
+            <Globe size={11} /> Return to Storefront
+          </Link>
+        </div>
+
+        {/* GOOGLE OAUTH POPUP SIMULATOR MODAL */}
+        {showGooglePopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-fade-in">
+            {/* Pop-up Window Box */}
+            <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden text-left flex flex-col justify-between h-[480px]">
+              
+              {/* Fake Browser Top Bar */}
+              <div className="bg-stone-100 border-b border-stone-200 px-4 py-2.5 flex items-center justify-between">
+                <span className="text-[10px] text-stone-500 font-semibold truncate">Sign in - Google Accounts</span>
+                <button onClick={() => setShowGooglePopup(false)} className="text-stone-400 hover:text-stone-700">
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* Popup Content */}
+              {googleStep === 0 ? (
+                // Step 0: Account Selection
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-center mb-4">
+                      {/* Google G Logo */}
+                      <svg className="w-8 h-8" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                    </div>
+
+                    <h2 className="text-center font-sans font-bold text-stone-900 text-lg">Choose an account</h2>
+                    <p className="text-center text-stone-400 text-[10px] mt-1">to continue to <span className="font-semibold text-stone-600">lucebylucy.online</span></p>
+
+                    {/* Accounts list */}
+                    <div className="mt-6 divide-y divide-stone-100 border-y border-stone-100">
+                      
+                      <div 
+                        onClick={() => handleChooseAccount("Luce Admin", "admin@lucebylucy.online")}
+                        className="py-3 flex items-center gap-3.5 hover:bg-stone-50 cursor-pointer transition-colors px-2"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center font-bold text-xs">LA</div>
+                        <div>
+                          <p className="text-xs font-bold text-stone-800 leading-none">Luce Admin</p>
+                          <span className="text-[10px] text-stone-400">admin@lucebylucy.online</span>
+                        </div>
+                      </div>
+
+                      <div 
+                        onClick={() => handleChooseAccount("Lucy Storefront", "lucy@lucebylucy.online")}
+                        className="py-3 flex items-center gap-3.5 hover:bg-stone-50 cursor-pointer transition-colors px-2"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-amber-800 text-stone-100 flex items-center justify-center font-bold text-xs">LS</div>
+                        <div>
+                          <p className="text-xs font-bold text-stone-800 leading-none">Lucy Storefront</p>
+                          <span className="text-[10px] text-stone-400">lucy@lucebylucy.online</span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <p className="text-[9px] text-stone-400 font-light leading-relaxed">
+                    To continue, Google will share your name, email address, language preference, and profile picture with Luce by Lucy.
+                  </p>
+                </div>
+              ) : (
+                // Step 1: Simulated Loading Handshake
+                <div className="p-6 flex-1 flex flex-col items-center justify-center text-center">
+                  <div className="w-10 h-10 border-[3px] border-stone-200 border-t-[#4285F4] rounded-full animate-spin mb-4" />
+                  <p className="text-xs font-bold text-stone-700 uppercase tracking-widest">Verifying Account...</p>
+                  <span className="text-[10px] text-stone-400 font-light mt-1">Connecting Google Authorization Tokens</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F6F4F0] flex text-stone-900 font-sans select-none antialiased">
+      
+      {/* SIDEBAR NAVIGATION */}
+      <aside className="w-64 bg-stone-900 text-stone-300 flex flex-col justify-between sticky top-0 h-screen p-6 shadow-xl z-20">
+        <div>
+          {/* Brand Logo inside Sidebar */}
+          <div className="flex flex-col text-left mb-10 pb-4 border-b border-stone-850">
+            <span className="font-serif text-lg font-bold tracking-[0.25em] text-white leading-tight">LUCE</span>
+            <span className="font-sans text-[8px] tracking-[0.35em] text-stone-500 font-bold -mt-0.5">BY LUCY ADMIN</span>
+          </div>
+
+          {/* Nav links */}
+          <nav className="flex flex-col gap-1.5">
+            <button 
+              onClick={() => setActiveTab("dashboard")}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${
+                activeTab === "dashboard" 
+                  ? "bg-white text-stone-900 shadow-md" 
+                  : "text-stone-400 hover:text-white hover:bg-stone-800"
+              }`}
+            >
+              <LayoutDashboard size={16} />
+              Dashboard Home
+            </button>
+            
+            <button 
+              onClick={() => setActiveTab("slider")}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${
+                activeTab === "slider" 
+                  ? "bg-white text-stone-900 shadow-md" 
+                  : "text-stone-400 hover:text-white hover:bg-stone-800"
+              }`}
+            >
+              <Sliders size={16} />
+              Hero Slider Editor
+            </button>
+
+            <button 
+              onClick={() => setActiveTab("products")}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${
+                activeTab === "products" 
+                  ? "bg-white text-stone-900 shadow-md" 
+                  : "text-stone-400 hover:text-white hover:bg-stone-800"
+              }`}
+            >
+              <Package size={16} />
+              Daftar Barang
+            </button>
+          </nav>
+        </div>
+
+        {/* User profile footer inside Sidebar */}
+        <div className="flex flex-col border-t border-stone-850 pt-5 mt-auto gap-4">
+          {user && (
+            <div className="flex items-center gap-3">
+              <img src={user.avatar} className="w-8 h-8 rounded-full border border-stone-700 shadow-sm" alt="User avatar" />
+              <div className="text-left min-w-0">
+                <p className="text-xs font-bold text-white leading-tight truncate">{user.name}</p>
+                <span className="text-[9px] text-stone-400 truncate block mt-0.5">{user.email}</span>
+              </div>
+            </div>
+          )}
+
+          <button 
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-2 w-full border border-stone-700 hover:border-red-500 hover:text-red-400 text-stone-400 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+          >
+            <LogOut size={14} />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 flex flex-col min-h-screen relative overflow-y-auto">
+        
+        {/* Admin Header */}
+        <header className="bg-white border-b border-stone-200 px-8 py-5 flex items-center justify-between sticky top-0 z-10 shadow-xs">
+          <div className="text-left">
+            <h2 className="text-lg font-bold text-stone-850">
+              {activeTab === "dashboard" && "Dashboard Overview"}
+              {activeTab === "slider" && "Hero Slider Configuration"}
+              {activeTab === "products" && "Product Inventory Management"}
+            </h2>
+            <span className="text-[10px] text-stone-400 mt-0.5 block">
+              Manage store content and products in real-time
+            </span>
+          </div>
+
+          <Link 
+            to="/" 
+            className="flex items-center gap-1.5 border border-stone-300 hover:bg-stone-50 text-stone-750 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-inner"
+          >
+            <Globe size={14} />
+            Visit Live Store
+          </Link>
+        </header>
+
+        {/* Main Dashboard Screens */}
+        <main className="flex-1 p-8">
+          
+          {/* 1. DASHBOARD HOME VIEW */}
+          {activeTab === "dashboard" && (
+            <div className="animate-fade-in flex flex-col gap-8 text-left">
+              {/* welcome message */}
+              <div className="bg-white border border-stone-200/80 rounded-3xl p-6 shadow-sm flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-stone-900 text-stone-50 flex items-center justify-center font-bold text-lg">
+                  👋
+                </div>
+                <div>
+                  <h3 className="font-serif text-xl font-bold">Hello, {user?.name}!</h3>
+                  <p className="text-xs text-stone-400 mt-1 font-light">Welcome to the administrative portal. Changes made in the editor screens are instantly synced and published.</p>
+                </div>
+              </div>
+
+              {/* Stats panel */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-28 cursor-pointer" onClick={() => setActiveTab("products")}>
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Total Inventory Items</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-stone-900">{products.length}</span>
+                    <span className="text-[10px] text-stone-400 font-light">Products Listed</span>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-28 cursor-pointer" onClick={() => setActiveTab("slider")}>
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Hero Carousel Slides</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-stone-900">{slides.length}</span>
+                    <span className="text-[10px] text-stone-400 font-light">Banner Configurations</span>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-stone-200/80 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-28">
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Active Simulator Sessions</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-stone-900">1</span>
+                    <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Live</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 2. HERO SLIDER EDITOR VIEW */}
+          {activeTab === "slider" && (
+            <div className="animate-fade-in flex flex-col gap-6 text-left">
+              {slides.map((slide) => (
+                <div key={slide.id} className="bg-white border border-stone-200/85 rounded-3xl p-6 shadow-sm">
+                  {editingSlideId === slide.id ? (
+                    // Slide Editing Mode Form
+                    <div className="flex flex-col md:flex-row gap-8">
+                      {/* image preview column */}
+                      <div className="w-full md:w-1/3 flex flex-col gap-3">
+                        <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest block">Slide Image Preview</span>
+                        <div className="aspect-[4/3] rounded-2xl bg-stone-50 border border-stone-200 overflow-hidden shadow-inner">
+                          <img src={slideForm.image || slide.image} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                        
+                        <div className="flex flex-col gap-1.5 mt-2">
+                          <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Image URL</label>
+                          <input 
+                            type="text" 
+                            value={slideForm.image}
+                            onChange={(e) => setSlideForm({ ...slideForm, image: e.target.value })}
+                            className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full"
+                            placeholder="Enter image URL"
+                          />
+                        </div>
+                      </div>
+
+                      {/* form data column */}
+                      <div className="flex-1 flex flex-col gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Eyebrow (Subtitle)</label>
+                            <input 
+                              type="text" 
+                              value={slideForm.eyebrow}
+                              onChange={(e) => setSlideForm({ ...slideForm, eyebrow: e.target.value })}
+                              className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full"
+                              placeholder="e.g. New Collection"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Linked Trending Product</label>
+                            <select 
+                              value={slideForm.trendingProductId}
+                              onChange={(e) => setSlideForm({ ...slideForm, trendingProductId: e.target.value })}
+                              className="border border-stone-250 p-2.5 rounded-xl text-xs font-semibold focus:outline-stone-500 w-full bg-white"
+                            >
+                              {products.map(p => (
+                                <option key={p.id} value={p.id}>{p.name} (${p.price.toFixed(2)})</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Headline</label>
+                          <input 
+                            type="text" 
+                            value={slideForm.headline}
+                            onChange={(e) => setSlideForm({ ...slideForm, headline: e.target.value })}
+                            className="border border-stone-250 p-2.5 rounded-xl text-xs font-semibold focus:outline-stone-500 w-full"
+                            placeholder="e.g. Elevate Your Style!"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Description</label>
+                          <textarea 
+                            rows={3}
+                            value={slideForm.description}
+                            onChange={(e) => setSlideForm({ ...slideForm, description: e.target.value })}
+                            className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full resize-none"
+                            placeholder="Describe this slide collection..."
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-3 mt-4">
+                          <button 
+                            onClick={() => handleSaveSlide(slide.id)}
+                            className="bg-stone-900 hover:bg-stone-800 text-stone-50 font-sans font-bold text-[10px] tracking-widest uppercase h-9 px-6 rounded-xl transition-colors shadow-sm"
+                          >
+                            Save slide
+                          </button>
+                          <button 
+                            onClick={() => setEditingSlideId(null)}
+                            className="border border-stone-300 hover:bg-stone-50 text-stone-600 font-sans font-bold text-[10px] tracking-widest uppercase h-9 px-6 rounded-xl transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Slide Display Mode
+                    <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+                      <div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-3/4">
+                        <img src={slide.image} alt={slide.headline} className="w-24 h-20 object-cover rounded-xl shadow-sm border border-stone-200" />
+                        <div className="text-left min-w-0 flex-1">
+                          <span className="text-[9px] font-bold text-amber-800 uppercase tracking-widest block">{slide.eyebrow}</span>
+                          <h4 className="font-serif text-lg font-bold text-stone-850 mt-1 truncate">{slide.headline}</h4>
+                          <p className="text-xs text-stone-400 mt-1 truncate max-w-lg font-light">{slide.description}</p>
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <span className="text-[8px] bg-stone-100 border border-stone-200/50 rounded-full py-0.5 px-2 font-bold text-stone-500 uppercase tracking-wider">
+                              Trending Product: {products.find(p => p.id === slide.trendingProductId)?.name || "Unknown"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button 
+                        onClick={() => handleEditSlide(slide)}
+                        className="flex items-center gap-2 border border-stone-300 hover:bg-stone-50 text-stone-700 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-inner w-full md:w-auto justify-center"
+                      >
+                        <Edit2 size={12} />
+                        Edit Slide
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 3. PRODUCT CATALOG EDITOR VIEW (DAFTAR BARANG) */}
+          {activeTab === "products" && (
+            <div className="animate-fade-in flex flex-col gap-6 text-left">
+              {/* Titlebar with Add Button */}
+              <div className="flex items-center justify-between bg-white border border-stone-200/60 p-4 rounded-2xl shadow-sm">
+                <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Catalog Inventory ({products.length} listed)</span>
+                <button 
+                  onClick={handleAddProductClick}
+                  className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-stone-50 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-98 cursor-pointer"
+                >
+                  <PlusCircle size={14} />
+                  Add New Product
+                </button>
+              </div>
+
+              {/* Inventory Table Card */}
+              <div className="bg-white border border-stone-200/80 rounded-3xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-stone-50 border-b border-stone-200 text-[9px] font-bold text-stone-400 uppercase tracking-widest">
+                        <th className="py-4 px-6">Product</th>
+                        <th className="py-4 px-6">Price</th>
+                        <th className="py-4 px-6">Colors</th>
+                        <th className="py-4 px-6">Description</th>
+                        <th className="py-4 px-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-200/50 text-xs">
+                      {products.map((p) => (
+                        <tr key={p.id} className="hover:bg-stone-50/50 transition-colors">
+                          <td className="py-4 px-6 flex items-center gap-3.5 min-w-[200px]">
+                            <img src={p.image} alt={p.name} className="w-10 h-12 object-cover rounded-xl bg-stone-100 border border-stone-200/40" />
+                            <div className="text-left min-w-0">
+                              <span className="font-bold text-stone-850 block truncate">{p.name}</span>
+                              <span className="text-[10px] text-stone-400 truncate block mt-0.5">ID: {p.id}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 font-bold text-stone-900">${p.price.toFixed(2)}</td>
+                          <td className="py-4 px-6 min-w-[120px]">
+                            <div className="flex gap-1.5 flex-wrap">
+                              {p.colors.map((color, i) => (
+                                <span 
+                                  key={color} 
+                                  title={p.colorNames[i]}
+                                  className="px-2 py-0.5 rounded-full border border-stone-200/80 text-[8px] font-semibold text-stone-500 flex items-center gap-1 bg-stone-100"
+                                >
+                                  <span style={{ backgroundColor: color }} className="w-1.5 h-1.5 rounded-full inline-block border border-stone-400/20" />
+                                  {p.colorNames[i]}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-stone-400 font-light max-w-sm truncate">{p.description}</td>
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button 
+                                onClick={() => handleEditProductClick(p)}
+                                className="p-2 border border-stone-200 hover:bg-stone-50 text-stone-600 rounded-xl transition-colors cursor-pointer"
+                                title="Edit Product"
+                              >
+                                <Edit2 size={13} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteProduct(p.id, p.name)}
+                                className="p-2 border border-stone-200 hover:border-red-200 hover:bg-red-50 text-red-500 rounded-xl transition-colors cursor-pointer"
+                                title="Delete Product"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+        </main>
+      </div>
+
+      {/* PRODUCT FORM ADD / EDIT DIALOG */}
+      {showProductModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs animate-fade-in text-left">
+          <form 
+            onSubmit={handleSaveProduct}
+            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden flex flex-col justify-between"
+          >
+            <div className="px-6 py-5 border-b border-stone-200/60 flex items-center justify-between">
+              <h3 className="font-serif text-lg font-bold tracking-wide">
+                {editingProductId ? "Edit Product Details" : "Add New Store Product"}
+              </h3>
+              <button 
+                type="button" 
+                onClick={() => setShowProductModal(false)} 
+                className="text-stone-400 hover:text-stone-700"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-6 flex flex-col gap-4 overflow-y-auto max-h-[420px]">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Product Name *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full"
+                    placeholder="e.g. Linen Scarf"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Price ($ USD) *</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    min="0"
+                    required
+                    value={productForm.price || ""}
+                    onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
+                    className="border border-stone-250 p-2.5 rounded-xl text-xs font-semibold focus:outline-stone-500 w-full"
+                    placeholder="e.g. 49.99"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Image URL *</label>
+                <input 
+                  type="text" 
+                  required
+                  value={productForm.image}
+                  onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                  className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full"
+                  placeholder="Paste Unsplash image URL"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Colors (Comma separated HEX) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={productForm.colorsStr}
+                    onChange={(e) => setProductForm({ ...productForm, colorsStr: e.target.value })}
+                    className="border border-stone-250 p-2.5 rounded-xl text-xs font-semibold focus:outline-stone-500 w-full"
+                    placeholder="e.g. #A38D7D, #111111"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Color Names (Comma separated) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={productForm.colorNamesStr}
+                    onChange={(e) => setProductForm({ ...productForm, colorNamesStr: e.target.value })}
+                    className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full"
+                    placeholder="e.g. Beige, Black"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Product Description</label>
+                <textarea 
+                  rows={3}
+                  value={productForm.description}
+                  onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                  className="border border-stone-250 p-2.5 rounded-xl text-xs font-medium focus:outline-stone-500 w-full resize-none"
+                  placeholder="Detail information about materials, fitting, and style..."
+                />
+              </div>
+
+            </div>
+
+            <div className="px-6 py-4 border-t border-stone-150 bg-stone-50 flex items-center justify-end gap-3">
+              <button 
+                type="button" 
+                onClick={() => setShowProductModal(false)}
+                className="border border-stone-300 hover:bg-stone-100 text-stone-600 font-sans font-bold text-[10px] tracking-widest uppercase h-9 px-6 rounded-xl transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="bg-stone-900 hover:bg-stone-800 text-stone-50 font-sans font-bold text-[10px] tracking-widest uppercase h-9 px-6 rounded-xl transition-colors shadow-sm cursor-pointer"
+              >
+                Save Product
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+    </div>
   );
 }
 
