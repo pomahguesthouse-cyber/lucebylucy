@@ -1,6 +1,6 @@
 // Service layer untuk media library (foto/video)
 // Semua akses ke database & storage dirutekan lewat file ini.
-import { supabase } from "@/integrations/supabase/client";
+import { getBackendClient } from "@/lib/backend-client";
 
 export const MEDIA_BUCKET = "media-library";
 const SIGNED_URL_TTL = 60 * 60; // 1 jam
@@ -34,6 +34,7 @@ interface MediaRow {
 const attachSignedUrls = async (rows: MediaRow[]): Promise<MediaItem[]> => {
   if (rows.length === 0) return [];
 
+  const supabase = await getBackendClient();
   const paths = rows.map((row) => row.storage_path);
   const { data: signed } = await supabase.storage
     .from(MEDIA_BUCKET)
@@ -61,6 +62,7 @@ const attachSignedUrls = async (rows: MediaRow[]): Promise<MediaItem[]> => {
 
 // Ambil media aktif untuk tampilan publik (galeri halaman depan)
 export const fetchActiveMedia = async (): Promise<MediaItem[]> => {
+  const supabase = await getBackendClient();
   const { data, error } = await supabase
     .from("media_items")
     .select("id, title, description, media_type, storage_path, sort_order, is_active, created_at")
@@ -74,6 +76,7 @@ export const fetchActiveMedia = async (): Promise<MediaItem[]> => {
 
 // Ambil semua media untuk dashboard admin
 export const fetchAllMedia = async (): Promise<MediaItem[]> => {
+  const supabase = await getBackendClient();
   const { data, error } = await supabase
     .from("media_items")
     .select("id, title, description, media_type, storage_path, sort_order, is_active, created_at")
@@ -98,6 +101,7 @@ interface UploadParams {
 
 // Unggah file baru ke storage lalu simpan metadata-nya
 export const uploadMedia = async ({ file, title, description }: UploadParams): Promise<void> => {
+  const supabase = await getBackendClient();
   const mediaType = resolveMediaType(file);
   if (!mediaType) {
     throw new Error("Format file tidak didukung. Gunakan foto atau video.");
@@ -138,6 +142,7 @@ export const renameMedia = async (
   title: string,
   description?: string,
 ): Promise<void> => {
+  const supabase = await getBackendClient();
   const { error } = await supabase
     .from("media_items")
     .update({ title: title.trim(), description: description?.trim() || null })
@@ -147,12 +152,14 @@ export const renameMedia = async (
 
 // Tampilkan/sembunyikan media dari galeri publik
 export const toggleMediaActive = async (id: string, isActive: boolean): Promise<void> => {
+  const supabase = await getBackendClient();
   const { error } = await supabase.from("media_items").update({ is_active: isActive }).eq("id", id);
   if (error) throw error;
 };
 
 // Hapus media beserta file-nya
 export const deleteMedia = async (id: string, storagePath: string): Promise<void> => {
+  const supabase = await getBackendClient();
   const { error } = await supabase.from("media_items").delete().eq("id", id);
   if (error) throw error;
   await supabase.storage.from(MEDIA_BUCKET).remove([storagePath]);
