@@ -1,7 +1,7 @@
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { VideoPreviewShowcase } from "@/components/landing/VideoPreviewShowcase";
+import { MediaGallery } from "@/components/landing/MediaGallery";
 import { FeaturedCollection } from "@/components/landing/FeaturedCollection";
 import { FabricLibrary } from "@/components/landing/FabricLibrary";
 import { SizeGuidePreview } from "@/components/landing/SizeGuidePreview";
@@ -14,7 +14,7 @@ export function Home() {
     <SiteLayout>
       <HeroSection />
       <HowItWorks />
-      <VideoPreviewShowcase />
+      <MediaGallery limit={6} />
       <FeaturedCollection />
       <FabricLibrary />
       <SizeGuidePreview />
