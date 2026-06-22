@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { SiteLayout } from "@/components/layout/SiteLayout";
 
 type Mode = "login" | "register";
 
@@ -56,8 +57,9 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-silk px-4 py-12 text-charcoal">
-      <div className="w-full max-w-md rounded-luxe border border-champagne/20 bg-white/80 p-8 shadow-soft">
+    <SiteLayout>
+      <section className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-silk px-4 py-12 text-charcoal">
+        <div className="w-full max-w-md rounded-luxe border border-champagne/20 bg-white/80 p-8 shadow-soft">
         <Link to="/" className="font-display text-2xl font-semibold text-charcoal">
           LUCE <span className="text-sm text-mink">Admin</span>
         </Link>
@@ -123,7 +125,8 @@ export function AdminLogin() {
             ? "Belum punya akun admin? Daftar di sini"
             : "Sudah punya akun? Masuk"}
         </button>
-      </div>
-    </div>
+        </div>
+      </section>
+    </SiteLayout>
   );
 }
