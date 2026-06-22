@@ -4,7 +4,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-champagne/15;
   }
 
   html {
@@ -213,6 +213,15 @@
   }
   to {
     transform: translateY(-9px) rotateY(5deg);
+  }
+}
+
+@keyframes mannequin-spin {
+  from {
+    transform: translateX(-50%) scale(1.08) rotateY(0deg);
+  }
+  to {
+    transform: translateX(-50%) scale(1.08) rotateY(360deg);
   }
 }
 
