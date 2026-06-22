@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Beranda", to: "/" },
   { label: "Koleksi", to: "/collections" },
+  { label: "Galeri", to: "/gallery" },
   { label: "AI Stylist", to: "/ai-stylist" },
   { label: "Panduan ukuran", to: "/size-guide" },
   { label: "Tentang", to: "/about" },
