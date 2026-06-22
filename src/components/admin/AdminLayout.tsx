@@ -34,10 +34,18 @@ interface AdminLayoutProps {
 }
 
 export function AdminLayout({ title, description, children }: AdminLayoutProps) {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/admin/login", { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-silk text-charcoal">
       <div className="mx-auto flex w-full max-w-[1320px] flex-col lg:flex-row">
-        <aside className="border-b border-champagne/15 bg-porcelain lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
+        <aside className="flex flex-col border-b border-champagne/15 bg-porcelain lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between p-5">
             <Link to="/" className="font-display text-xl font-semibold text-charcoal">
               LUCE <span className="text-xs text-mink">Admin</span>
@@ -61,6 +69,14 @@ export function AdminLayout({ title, description, children }: AdminLayoutProps) 
               </NavLink>
             ))}
           </nav>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="mx-3 mb-5 mt-auto hidden items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-mink transition hover:bg-white/70 hover:text-charcoal lg:flex"
+          >
+            <LogOut className="h-4 w-4" />
+            Keluar
+          </button>
         </aside>
 
         <main className="flex-1 p-5 sm:p-8">
