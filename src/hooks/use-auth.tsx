@@ -29,11 +29,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdmin = useCallback(async (userId: string) => {
     const supabase = await getBackendClient();
-    const { data } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    setIsAdmin(Boolean(data));
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    setIsAdmin(!error && data?.role === "admin");
   }, []);
 
   useEffect(() => {
