@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   ClipboardList,
+  Image as ImageIcon,
   LayoutDashboard,
+  LogOut,
   Package,
   Palette,
   Scissors,
@@ -11,9 +13,11 @@ import {
   Shirt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 const adminNav = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard, end: true },
+  { label: "Media library", to: "/admin/media", icon: ImageIcon },
   { label: "Design requests", to: "/admin/design-requests", icon: ClipboardList },
   { label: "Products", to: "/admin/products", icon: Shirt },
   { label: "Fabrics", to: "/admin/fabrics", icon: Package },
