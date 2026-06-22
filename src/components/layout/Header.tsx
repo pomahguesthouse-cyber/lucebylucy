@@ -88,6 +88,11 @@ export function Header() {
                 {item.label}
               </NavLink>
             ))}
+            <Link to="/admin/login" onClick={() => setOpen(false)} className="mt-2">
+              <Button variant="outline" className="w-full">
+                Masuk
+              </Button>
+            </Link>
             <Link to="/customize" onClick={() => setOpen(false)} className="mt-2">
               <Button variant="gold" className="w-full">
                 Mulai desain
