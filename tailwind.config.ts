@@ -17,7 +17,7 @@ export default {
         blush: "#e7c5c0",
       },
       fontFamily: {
-        display: ["Georgia", "Cambria", "Times New Roman", "serif"],
+        display: ["Cormorant Garamond", "Georgia", "Times New Roman", "serif"],
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {

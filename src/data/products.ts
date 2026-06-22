@@ -1,0 +1,58 @@
+import type { ProductModel } from "@/types";
+
+export const products: ProductModel[] = [
+  {
+    id: "gamis-aline-elegance",
+    name: "Gamis A-Line Elegance",
+    category: "gamis",
+    description: "Gamis potongan A-line yang melangsingkan dengan flare lembut di bawah.",
+    basePrice: 385000,
+    imageColor: "#e6d8c2",
+    bestFor: "Acara keluarga & semi formal",
+  },
+  {
+    id: "abaya-flow-premium",
+    name: "Abaya Flow Premium",
+    category: "abaya",
+    description: "Abaya flowy dengan jatuh kain mewah dan detail minimalis.",
+    basePrice: 520000,
+    imageColor: "#cdbfa8",
+    bestFor: "Acara formal & undangan",
+  },
+  {
+    id: "tunik-daily-soft",
+    name: "Tunik Daily Soft",
+    category: "tunik",
+    description: "Tunik ringan yang nyaman untuk aktivitas harian.",
+    basePrice: 245000,
+    imageColor: "#dcdbc7",
+    bestFor: "Kerja & kasual",
+  },
+  {
+    id: "outer-raya-layer",
+    name: "Outer Raya Layer",
+    category: "outer",
+    description: "Outer berlapis dengan siluet anggun untuk tampilan istimewa.",
+    basePrice: 410000,
+    imageColor: "#e7cfc9",
+    bestFor: "Lebaran & acara spesial",
+  },
+  {
+    id: "dress-modest-classic",
+    name: "Dress Modest Classic",
+    category: "dress",
+    description: "Dress modest klasik dengan potongan timeless dan elegan.",
+    basePrice: 365000,
+    imageColor: "#d7c4b0",
+    bestFor: "Pesta & dinner",
+  },
+  {
+    id: "hijab-set-minimal",
+    name: "Hijab Set Minimal",
+    category: "hijab-set",
+    description: "Set hijab serasi dengan warna senada untuk tampilan menyatu.",
+    basePrice: 195000,
+    imageColor: "#c8cdb9",
+    bestFor: "Sehari-hari & travel",
+  },
+];
