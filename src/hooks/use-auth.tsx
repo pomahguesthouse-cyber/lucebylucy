@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { getBackendClient } from "@/lib/backend-client";
 
 interface AuthContextValue {
   session: Session | null;
@@ -28,18 +28,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const checkAdmin = useCallback(async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    setIsAdmin(Boolean(data));
+    const supabase = await getBackendClient();
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    setIsAdmin(!error && data?.role === "admin");
   }, []);
 
   useEffect(() => {
+    let active = true;
+    let unsubscribe: (() => void) | undefined;
+
+    const initializeAuth = async () => {
+      try {
+        const supabase = await getBackendClient();
+
     // Daftarkan listener dulu agar tidak melewatkan event
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!active) return;
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
       if (nextSession?.user) {
@@ -53,19 +65,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      if (currentSession?.user) {
-        void checkAdmin(currentSession.user.id);
-      }
-      setLoading(false);
-    });
+        unsubscribe = () => subscription.unsubscribe();
 
-    return () => subscription.unsubscribe();
+        const {
+          data: { session: currentSession },
+        } = await supabase.auth.getSession();
+        if (!active) return;
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        if (currentSession?.user) {
+          void checkAdmin(currentSession.user.id);
+        }
+      } catch {
+        if (!active) return;
+        setSession(null);
+        setUser(null);
+        setIsAdmin(false);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    void initializeAuth();
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
   }, [checkAdmin]);
 
   const signOut = useCallback(async () => {
+    const supabase = await getBackendClient();
     await supabase.auth.signOut();
     setIsAdmin(false);
   }, []);

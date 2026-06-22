@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { getBackendClient, getBackendErrorMessage } from "@/lib/backend-client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -29,6 +29,7 @@ export function AdminLogin() {
     event.preventDefault();
     setSubmitting(true);
     try {
+      const supabase = await getBackendClient();
       if (mode === "register") {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -49,8 +50,7 @@ export function AdminLogin() {
         toast.success("Berhasil masuk.");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Terjadi kesalahan.";
-      toast.error(message);
+      toast.error(getBackendErrorMessage(error));
     } finally {
       setSubmitting(false);
     }
