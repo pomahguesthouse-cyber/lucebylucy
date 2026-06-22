@@ -58,7 +58,7 @@ interface CustomizerState {
   resetCustomizer: () => void;
 }
 
-export const useCustomizerStore = create<CustomizerState>((set) => ({
+export const useCustomizerStore = create<CustomizerState>()((set) => ({
   customerName: "",
   selectedCategory: null,
   selectedModel: null,
