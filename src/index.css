@@ -2,120 +2,223 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Linea E-commerce Design System - Minimalist & Modern */
-
-@layer base {
-  :root {
-    /* Core neutral palette */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    
-    /* Status bar */
-    --status-bar: 0 0% 0%;
-    --status-bar-foreground: 0 0% 100%;
-    
-    /* Navigation */
-    --nav-background: 0 0% 100%;
-    --nav-foreground: 0 0% 20%;
-    --nav-hover: 0 0% 5%;
-    
-    /* Interactive elements */
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 0 0% 15%;
-    
-    /* Subtle elements */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 20%;
-    
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
-    
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
-    
-    /* Cards and surfaces */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    
-    --radius: 0.375rem;
-    
-    /* Transitions */
-    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 0 0% 9%;
-    --foreground: 0 0% 98%;
-    
-    --status-bar: 0 0% 0%;
-    --status-bar-foreground: 0 0% 100%;
-    
-    --nav-background: 0 0% 9%;
-    --nav-foreground: 0 0% 80%;
-    --nav-hover: 0 0% 95%;
-    
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --primary-hover: 0 0% 90%;
-    
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 80%;
-    
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-    
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 98%;
-    
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 98%;
-    
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 98%;
-    
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 98%;
-    
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 98%;
-  }
-}
-
 @layer base {
   * {
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground font-light;
+    margin: 0;
+    min-width: 320px;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto w-[min(1180px,calc(100%-32px))];
+  }
+
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 700ms ease, transform 700ms ease;
+  }
+
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mannequin-wrap {
+    position: relative;
+    width: 280px;
+    height: 470px;
+    filter: drop-shadow(0 28px 28px rgba(73, 55, 36, 0.2));
+    animation: mannequin-float 6s ease-in-out infinite alternate;
+  }
+
+  .mannequin-head,
+  .mannequin-neck,
+  .mannequin-hand {
+    position: absolute;
+    background: linear-gradient(135deg, #f4eee6, #d8c7b7);
+  }
+
+  .mannequin-head {
+    top: 0;
+    left: 50%;
+    width: 48px;
+    height: 68px;
+    border-radius: 50% 50% 44% 44%;
+    transform: translateX(-50%);
+    box-shadow: inset -7px 0 12px rgba(112, 86, 64, 0.12);
+  }
+
+  .mannequin-head::after {
+    content: "";
+    position: absolute;
+    inset: 9px 7px;
+    border-radius: inherit;
+    background: rgba(255,255,255,.5);
+  }
+
+  .mannequin-neck {
+    top: 61px;
+    left: 50%;
+    width: 28px;
+    height: 36px;
+    border-radius: 12px;
+    transform: translateX(-50%);
+  }
+
+  .mannequin-dress {
+    position: absolute;
+    top: 88px;
+    left: 50%;
+    width: 190px;
+    height: 330px;
+    transform: translateX(-50%);
+    border-radius: 72px 72px 18px 18px;
+    clip-path: polygon(28% 0, 72% 0, 84% 32%, 100% 100%, 0 100%, 16% 32%);
+    background:
+      linear-gradient(90deg, rgba(255,255,255,.45), transparent 26%, rgba(28,24,22,.08) 72%),
+      linear-gradient(140deg, var(--dress-a), var(--dress-b));
+    overflow: hidden;
+  }
+
+  .mannequin-dress::before {
+    content: "";
+    position: absolute;
+    inset: 12px 60px 0;
+    border-left: 1px solid rgba(255,255,255,.6);
+    border-right: 1px solid rgba(64,48,36,.1);
+    background: linear-gradient(180deg, rgba(255,255,255,.22), transparent);
+  }
+
+  .mannequin-dress::after {
+    content: "";
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    height: 9px;
+    width: 88px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: rgba(100, 75, 48, 0.32);
+    box-shadow: 0 11px 0 rgba(255,255,255,.16);
+  }
+
+  .mannequin-dress.is-detailed {
+    clip-path: polygon(30% 0, 70% 0, 82% 34%, 92% 64%, 100% 100%, 50% 88%, 0 100%, 8% 64%, 18% 34%);
+  }
+
+  .mannequin-lines {
+    position: absolute;
+    top: 115px;
+    left: 50%;
+    width: 170px;
+    height: 280px;
+    transform: translateX(-50%);
+    opacity: .34;
+    clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%);
+    background-image: linear-gradient(90deg, transparent 0 17px, rgba(255,255,255,.85) 18px, transparent 20px);
+    background-size: 25px 100%;
+  }
+
+  .mannequin-sleeve {
+    position: absolute;
+    top: 106px;
+    width: 70px;
+    height: 216px;
+    border-radius: 42px 42px 24px 24px;
+    background: linear-gradient(140deg, var(--dress-a), var(--dress-b));
+  }
+
+  .mannequin-sleeve-left {
+    left: 24px;
+    transform: rotate(9deg);
+  }
+
+  .mannequin-sleeve-right {
+    right: 24px;
+    transform: rotate(-9deg);
+  }
+
+  .mannequin-hand {
+    top: 295px;
+    width: 18px;
+    height: 38px;
+    border-radius: 999px;
+  }
+
+  .mannequin-hand-left {
+    left: 40px;
+  }
+
+  .mannequin-hand-right {
+    right: 40px;
+  }
+
+  .mannequin-base {
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 210px;
+    height: 34px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(255,255,255,.65);
+    box-shadow: 0 12px 25px rgba(73,55,36,.13);
+  }
+
+  .mannequin-sage {
+    --dress-a: #c5c9b6;
+    --dress-b: #8f9b7f;
+  }
+
+  .mannequin-ivory {
+    --dress-a: #f0eadf;
+    --dress-b: #d2c2ae;
+  }
+
+  .mannequin-blush {
+    --dress-a: #e7c5c0;
+    --dress-b: #c99790;
+  }
+
+  .mannequin-navy {
+    --dress-a: #2e344a;
+    --dress-b: #101423;
+  }
+
+  .mannequin-black {
+    --dress-a: #3b3936;
+    --dress-b: #11100f;
+  }
+
+  .mannequin-sand {
+    --dress-a: #eadfcf;
+    --dress-b: #c8ae86;
+  }
+}
+
+@keyframes mannequin-float {
+  from {
+    transform: translateY(0) rotateY(-3deg);
+  }
+  to {
+    transform: translateY(-9px) rotateY(5deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .mannequin-wrap {
+    width: 240px;
+    transform: scale(.86);
   }
 }
