@@ -194,7 +194,7 @@ export function FeaturedCollection() {
   };
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-10 md:py-14">
       <div className="container">
         <Reveal>
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
@@ -202,7 +202,7 @@ export function FeaturedCollection() {
               <span className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
                 Koleksi
               </span>
-              <h2 className="mt-3 font-display text-3xl font-semibold text-charcoal sm:text-4xl">
+              <h2 className="mt-2 font-display text-3xl font-semibold text-charcoal sm:text-4xl">
                 Pilih kategori favorit Anda
               </h2>
             </div>
@@ -212,23 +212,23 @@ export function FeaturedCollection() {
           </div>
         </Reveal>
 
-        <div className="relative mt-10">
+        <div className="relative mt-7">
           <div
             ref={sliderRef}
-            className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-4"
+            className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-3"
             aria-label="Slider kategori koleksi"
           >
             {sliderCategories.map((category, index) => (
               <Reveal
                 key={category.id}
                 delay={index * 0.04}
-                className="min-w-[82%] snap-start sm:min-w-[48%] lg:min-w-[32%]"
+                className="min-w-[72%] snap-start sm:min-w-[38%] lg:min-w-[27%]"
               >
                 <Link
                   to={category.localId ? `/collections?category=${category.localId}` : "/collections"}
-                  className="group flex aspect-[3/4] min-h-[430px] flex-col overflow-hidden rounded-[42px] border border-champagne/15 bg-[#efe6dc] p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-champagne/40 hover:shadow-luxe sm:min-h-[500px]"
+                  className="group flex aspect-[3/4] min-h-[320px] flex-col overflow-hidden rounded-[34px] border border-champagne/15 bg-[#efe6dc] p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-champagne/40 hover:shadow-luxe sm:min-h-[380px]"
                 >
-                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[34px] bg-[#efe6dc] p-4">
+                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[28px] bg-[#efe6dc] p-3">
                     {category.coverUrl ? (
                       <img
                         src={category.coverUrl}
@@ -243,9 +243,9 @@ export function FeaturedCollection() {
                       </div>
                     )}
                   </div>
-                  <div className="pb-3 text-center">
+                  <div className="pb-2 text-center">
                     <h3
-                      className="text-3xl font-bold uppercase leading-none tracking-[0.32em] sm:text-4xl"
+                      className="text-2xl font-bold uppercase leading-none tracking-[0.3em] sm:text-3xl"
                       style={{
                         color: category.localId ? categoryAccent[category.localId] : "#a66f3c",
                       }}
@@ -258,7 +258,7 @@ export function FeaturedCollection() {
             ))}
           </div>
 
-          <div className="mt-5 flex justify-end gap-3">
+          <div className="mt-3 flex justify-end gap-3">
             <button
               type="button"
               onClick={() => scrollSlider("previous")}
