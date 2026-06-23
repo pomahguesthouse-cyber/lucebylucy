@@ -88,7 +88,8 @@ export const fetchActiveCategories = async (): Promise<CollectionCategory[]> => 
 // Unggah cover image ke storage, kembalikan storage path-nya
 const uploadCover = async (file: File): Promise<string> => {
   const supabase = await getBackendClient();
-  if (!file.type.startsWith("image/")) {
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+  if (!file.type.startsWith("image/") && extension !== "svg") {
     throw new Error("Cover harus berupa file gambar.");
   }
 
@@ -97,12 +98,15 @@ const uploadCover = async (file: File): Promise<string> => {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
 
-  const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const storagePath = `categories/${user.id}/${crypto.randomUUID()}.${extension}`;
 
   const { error: uploadError } = await supabase.storage
     .from(MEDIA_BUCKET)
-    .upload(storagePath, file, { cacheControl: "3600", upsert: false });
+    .upload(storagePath, file, {
+      cacheControl: "3600",
+      contentType: extension === "svg" ? "image/svg+xml" : file.type || undefined,
+      upsert: false,
+    });
   if (uploadError) throw uploadError;
 
   return storagePath;
@@ -112,6 +116,7 @@ interface CategoryInput {
   name: string;
   description?: string;
   coverFile?: File | null;
+  sortOrder?: number;
 }
 
 // Buat kategori baru (dengan cover image opsional)
@@ -119,6 +124,7 @@ export const createCategory = async ({
   name,
   description,
   coverFile,
+  sortOrder = 0,
 }: CategoryInput): Promise<void> => {
   const supabase = await getBackendClient();
   const {
@@ -133,6 +139,7 @@ export const createCategory = async ({
     name: name.trim(),
     description: description?.trim() || null,
     cover_storage_path: coverStoragePath,
+    sort_order: sortOrder,
     created_by: user.id,
   });
 
@@ -156,6 +163,7 @@ export const updateCategory = async ({
   description,
   coverFile,
   currentCoverPath,
+  sortOrder,
 }: CategoryUpdate): Promise<void> => {
   const supabase = await getBackendClient();
 
@@ -170,6 +178,7 @@ export const updateCategory = async ({
       name: name.trim(),
       description: description?.trim() || null,
       cover_storage_path: coverStoragePath,
+      ...(typeof sortOrder === "number" ? { sort_order: sortOrder } : {}),
     })
     .eq("id", id);
 
@@ -179,6 +188,23 @@ export const updateCategory = async ({
   if (coverFile && currentCoverPath && currentCoverPath !== coverStoragePath) {
     await supabase.storage.from(MEDIA_BUCKET).remove([currentCoverPath]);
   }
+};
+
+export const updateCategorySortOrders = async (
+  updates: Array<{ id: string; sortOrder: number }>,
+): Promise<void> => {
+  const supabase = await getBackendClient();
+  const results = await Promise.all(
+    updates.map(({ id, sortOrder }) =>
+      supabase
+        .from("collection_categories")
+        .update({ sort_order: sortOrder })
+        .eq("id", id),
+    ),
+  );
+
+  const failed = results.find((result) => result.error);
+  if (failed?.error) throw failed.error;
 };
 
 // Tampilkan/sembunyikan kategori dari halaman publik

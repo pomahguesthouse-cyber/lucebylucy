@@ -8,6 +8,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  GripVertical,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,12 +20,14 @@ import {
   fetchAllCategories,
   toggleCategoryActive,
   updateCategory,
+  updateCategorySortOrders,
   type CollectionCategory,
 } from "@/lib/category-service";
 
 interface FormState {
   name: string;
   description: string;
+  sortOrder: string;
   coverFile: File | null;
   coverPreview: string | null;
 }
@@ -32,6 +35,7 @@ interface FormState {
 const emptyForm: FormState = {
   name: "",
   description: "",
+  sortOrder: "",
   coverFile: null,
   coverPreview: null,
 };
@@ -41,6 +45,8 @@ export function AdminCategories() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,6 +85,7 @@ export function AdminCategories() {
     setForm({
       name: item.name,
       description: item.description ?? "",
+      sortOrder: String(item.sortOrder),
       coverFile: null,
       coverPreview: item.coverUrl,
     });
@@ -92,6 +99,8 @@ export function AdminCategories() {
       toast.error("Nama kategori wajib diisi.");
       return;
     }
+    const sortOrder = Number.parseInt(form.sortOrder, 10);
+    const hasManualSortOrder = form.sortOrder.trim() !== "" && !Number.isNaN(sortOrder);
     setSaving(true);
     try {
       if (editingId) {
@@ -100,6 +109,7 @@ export function AdminCategories() {
           id: editingId,
           name: form.name,
           description: form.description,
+          sortOrder: hasManualSortOrder ? sortOrder : current?.sortOrder,
           coverFile: form.coverFile,
           currentCoverPath: current?.coverStoragePath ?? null,
         });
@@ -108,6 +118,7 @@ export function AdminCategories() {
         await createCategory({
           name: form.name,
           description: form.description,
+          sortOrder: hasManualSortOrder ? sortOrder : items.length * 10,
           coverFile: form.coverFile,
         });
         toast.success("Kategori ditambahkan.");
@@ -120,6 +131,48 @@ export function AdminCategories() {
       toast.error(message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const persistOrder = async (reordered: CollectionCategory[]) => {
+    const nextItems = reordered.map((item, nextIndex) => ({
+      ...item,
+      sortOrder: nextIndex * 10,
+    }));
+    setItems(nextItems);
+    await updateCategorySortOrders(
+      nextItems.map((item) => ({
+        id: item.id,
+        sortOrder: item.sortOrder,
+      })),
+    );
+  };
+
+  const handleDrop = async (targetId: string) => {
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      setDragOverId(null);
+      return;
+    }
+
+    const fromIndex = items.findIndex((item) => item.id === draggedId);
+    const targetIndex = items.findIndex((item) => item.id === targetId);
+    if (fromIndex < 0 || targetIndex < 0) return;
+
+    const reordered = [...items];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    try {
+      await persistOrder(reordered);
+      toast.success("Urutan kategori diperbarui.");
+      await loadCategories();
+    } catch {
+      toast.error("Gagal mengubah urutan kategori.");
+      await loadCategories();
+    } finally {
+      setDraggedId(null);
+      setDragOverId(null);
     }
   };
 
@@ -167,7 +220,7 @@ export function AdminCategories() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-[1fr_1fr_160px]">
           <div>
             <label className="text-xs font-medium uppercase tracking-wide text-mink">
               Nama kategori
@@ -194,6 +247,20 @@ export function AdminCategories() {
               placeholder="Contoh: Gamis syar'i elegan untuk acara."
             />
           </div>
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">
+              Urutan
+            </label>
+            <input
+              type="number"
+              value={form.sortOrder}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, sortOrder: event.target.value }))
+              }
+              className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
+              placeholder={String(items.length * 10)}
+            />
+          </div>
         </div>
 
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -218,7 +285,7 @@ export function AdminCategories() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,.svg"
               className="hidden"
               onChange={handleCoverChange}
             />
@@ -251,18 +318,48 @@ export function AdminCategories() {
           Belum ada kategori. Tambahkan kategori koleksi pertama Anda.
         </div>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item, index) => (
             <div
               key={item.id}
-              className="overflow-hidden rounded-luxe border border-champagne/15 bg-white/80 shadow-soft"
+              onDragOver={(event) => {
+                event.preventDefault();
+                if (draggedId && draggedId !== item.id) setDragOverId(item.id);
+              }}
+              onDragLeave={() => setDragOverId(null)}
+              onDrop={(event) => {
+                event.preventDefault();
+                void handleDrop(item.id);
+              }}
+              className={`overflow-hidden rounded-[22px] border bg-white/80 shadow-soft transition ${
+                dragOverId === item.id
+                  ? "border-champagne/70 ring-2 ring-champagne/25"
+                  : "border-champagne/15"
+              } ${draggedId === item.id ? "opacity-60" : ""}`}
             >
-              <div className="relative aspect-[4/3] bg-ivory">
+              <div className="relative aspect-[5/4] bg-ivory">
+                <button
+                  type="button"
+                  draggable
+                  onDragStart={(event) => {
+                    setDraggedId(item.id);
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", item.id);
+                  }}
+                  onDragEnd={() => {
+                    setDraggedId(null);
+                    setDragOverId(null);
+                  }}
+                  className="absolute left-3 top-3 z-10 inline-flex h-9 w-9 cursor-grab items-center justify-center rounded-full bg-white/85 text-mink shadow-soft transition hover:text-charcoal active:cursor-grabbing"
+                  aria-label={`Geser ${item.name} untuk mengubah urutan`}
+                >
+                  <GripVertical className="h-4 w-4" />
+                </button>
                 {item.coverUrl ? (
                   <img
                     src={item.coverUrl}
                     alt={item.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain p-3"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-xs text-mink">
@@ -274,23 +371,33 @@ export function AdminCategories() {
                     Tersembunyi
                   </span>
                 )}
+                <span className="absolute right-3 top-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-champagne shadow-soft">
+                  #{index + 1}
+                </span>
               </div>
 
-              <div className="space-y-3 p-4">
+              <div className="space-y-3 p-3.5">
                 <div>
-                  <p className="font-medium text-charcoal">{item.name}</p>
+                  <p className="font-medium leading-tight text-charcoal">{item.name}</p>
                   {item.description && (
-                    <p className="mt-0.5 text-xs text-mink">{item.description}</p>
+                    <p className="mt-0.5 line-clamp-2 text-xs text-mink">{item.description}</p>
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button type="button" size="sm" variant="outline" onClick={() => startEdit(item)}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-3"
+                    onClick={() => startEdit(item)}
+                  >
                     <Pencil className="h-3.5 w-3.5" /> Ubah
                   </Button>
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
+                    className="h-8 px-3"
                     onClick={() => handleToggle(item)}
                   >
                     {item.isActive ? (
@@ -307,6 +414,7 @@ export function AdminCategories() {
                     type="button"
                     size="sm"
                     variant="outline"
+                    className="h-8 px-3"
                     onClick={() => handleDelete(item)}
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Hapus

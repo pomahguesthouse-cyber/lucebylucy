@@ -48,7 +48,7 @@ export function AdminLayout({ title, description, children }: AdminLayoutProps) 
 
   return (
     <div className="min-h-screen bg-silk text-charcoal">
-      <div className="mx-auto flex w-full max-w-[1320px] flex-col lg:flex-row">
+      <div className="flex w-full flex-col lg:flex-row">
         <aside className="flex flex-col border-b border-champagne/15 bg-porcelain lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between p-5">
             <Link to="/" className="font-display text-xl font-semibold text-charcoal">
@@ -83,7 +83,7 @@ export function AdminLayout({ title, description, children }: AdminLayoutProps) 
           </button>
         </aside>
 
-        <main className="flex-1 p-5 sm:p-8">
+        <main className="min-w-0 flex-1 p-5 sm:p-8">
           <header className="mb-6">
             <h1 className="font-display text-2xl font-semibold text-charcoal sm:text-3xl">
               {title}
