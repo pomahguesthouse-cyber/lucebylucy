@@ -1,4 +1,4 @@
-﻿import { Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VideoPreviewFrameProps {
@@ -40,22 +40,22 @@ export function VideoPreviewFrame({
         </div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-charcoal/20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-charcoal/10" />
 
-      <div className="absolute left-4 top-4 max-w-[calc(100%-2rem)] rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne shadow-soft backdrop-blur">
+      <div className="absolute left-4 top-4 rounded-full bg-white/75 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne">
         {label}
       </div>
 
       {showPlay && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/85 shadow-soft backdrop-blur transition-transform duration-300 hover:scale-105">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/85 shadow-soft">
             <Play className="ml-1 h-6 w-6 text-champagne" fill="currentColor" />
           </div>
         </div>
       )}
 
-      <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/75 px-4 py-3 shadow-soft backdrop-blur">
-        <p className="text-sm font-medium leading-relaxed text-charcoal">{caption}</p>
+      <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/70 px-4 py-3 backdrop-blur">
+        <p className="text-sm font-medium text-charcoal">{caption}</p>
       </div>
     </div>
   );
