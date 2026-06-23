@@ -141,6 +141,7 @@ function CategorySketch({ categoryId }: { categoryId: CategoryId }) {
 
 export function FeaturedCollection() {
   const sliderRef = useRef<HTMLDivElement>(null);
+  const sliderAnimationRef = useRef<number | null>(null);
   const [backendCategories, setBackendCategories] = useState<CollectionCategory[]>([]);
   const [isBackendLoaded, setIsBackendLoaded] = useState(false);
 
@@ -162,6 +163,9 @@ export function FeaturedCollection() {
 
     return () => {
       active = false;
+      if (sliderAnimationRef.current) {
+        window.cancelAnimationFrame(sliderAnimationRef.current);
+      }
     };
   }, []);
 
@@ -187,10 +191,32 @@ export function FeaturedCollection() {
     const slider = sliderRef.current;
     if (!slider) return;
 
-    slider.scrollBy({
-      left: direction === "next" ? slider.clientWidth * 0.85 : -slider.clientWidth * 0.85,
-      behavior: "smooth",
-    });
+    if (sliderAnimationRef.current) {
+      window.cancelAnimationFrame(sliderAnimationRef.current);
+    }
+
+    const start = slider.scrollLeft;
+    const distance = direction === "next" ? slider.clientWidth * 0.85 : -slider.clientWidth * 0.85;
+    const maxScroll = slider.scrollWidth - slider.clientWidth;
+    const target = Math.min(Math.max(start + distance, 0), maxScroll);
+    const duration = 620;
+    const startedAt = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startedAt;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      slider.scrollLeft = start + (target - start) * eased;
+
+      if (progress < 1) {
+        sliderAnimationRef.current = window.requestAnimationFrame(animate);
+      } else {
+        sliderAnimationRef.current = null;
+      }
+    };
+
+    sliderAnimationRef.current = window.requestAnimationFrame(animate);
   };
 
   return (
@@ -215,7 +241,7 @@ export function FeaturedCollection() {
         <div className="relative mt-7">
           <div
             ref={sliderRef}
-            className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-3"
+            className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3"
             aria-label="Slider kategori koleksi"
           >
             {sliderCategories.map((category, index) => (
