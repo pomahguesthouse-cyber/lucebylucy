@@ -19,6 +19,7 @@ import { AdminLogin } from "@/pages/AdminLogin";
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
 import { AdminDesignRequests } from "@/pages/admin/AdminDesignRequests";
 import { AdminProducts } from "@/pages/admin/AdminProducts";
+import { AdminCategories } from "@/pages/admin/AdminCategories";
 import { AdminFabrics } from "@/pages/admin/AdminFabrics";
 import { AdminColors } from "@/pages/admin/AdminColors";
 import { AdminMedia } from "@/pages/admin/AdminMedia";
@@ -58,6 +59,14 @@ function App() {
           element={
             <RequireAdmin>
               <AdminDesignRequests />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/admin/categories"
+          element={
+            <RequireAdmin>
+              <AdminCategories />
             </RequireAdmin>
           }
         />
