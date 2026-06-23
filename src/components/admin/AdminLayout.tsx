@@ -7,6 +7,7 @@ import {
   LogOut,
   Package,
   Palette,
+  PlaySquare,
   Scissors,
   Settings,
   ShoppingBag,
@@ -19,6 +20,7 @@ import { useAuth } from "@/hooks/use-auth";
 const adminNav = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard, end: true },
   { label: "Media library", to: "/admin/media", icon: ImageIcon },
+  { label: "Video hero", to: "/admin/video-hero", icon: PlaySquare },
   { label: "Design requests", to: "/admin/design-requests", icon: ClipboardList },
   { label: "Kategori koleksi", to: "/admin/categories", icon: Tags },
   { label: "Products", to: "/admin/products", icon: Shirt },

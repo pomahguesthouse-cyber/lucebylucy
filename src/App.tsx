@@ -23,6 +23,7 @@ import { AdminCategories } from "@/pages/admin/AdminCategories";
 import { AdminFabrics } from "@/pages/admin/AdminFabrics";
 import { AdminColors } from "@/pages/admin/AdminColors";
 import { AdminMedia } from "@/pages/admin/AdminMedia";
+import { AdminHeroMedia } from "@/pages/admin/AdminHeroMedia";
 import { AdminOrders } from "@/pages/admin/AdminOrders";
 import { AdminProductionNotes } from "@/pages/admin/AdminProductionNotes";
 import { AdminSettings } from "@/pages/admin/AdminSettings";
@@ -99,6 +100,14 @@ function App() {
           element={
             <RequireAdmin>
               <AdminMedia />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/admin/video-hero"
+          element={
+            <RequireAdmin>
+              <AdminHeroMedia />
             </RequireAdmin>
           }
         />

@@ -53,6 +53,45 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_media: {
+        Row: {
+          caption: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          media_type: string
+          slot: string
+          storage_path: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          media_type: string
+          slot?: string
+          storage_path: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          media_type?: string
+          slot?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media_items: {
         Row: {
           created_at: string

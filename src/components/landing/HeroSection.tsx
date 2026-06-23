@@ -1,9 +1,32 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VideoPreviewFrame } from "@/components/video-preview/VideoPreviewFrame";
+import { fetchActiveHeroMedia, type HeroMedia } from "@/lib/hero-media-service";
 
 export function HeroSection() {
+  const [heroMedia, setHeroMedia] = useState<HeroMedia | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadHeroMedia = async () => {
+      try {
+        const data = await fetchActiveHeroMedia();
+        if (active) setHeroMedia(data);
+      } catch {
+        if (active) setHeroMedia(null);
+      }
+    };
+
+    void loadHeroMedia();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <section className="relative overflow-hidden">
       <div className="container grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.1fr_0.9fr]">
@@ -49,7 +72,12 @@ export function HeroSection() {
         <div className="relative mx-auto w-full max-w-sm">
           <div className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-blush/40 blur-2xl" />
           <div className="absolute -bottom-8 -right-4 h-28 w-28 rounded-full bg-sage/40 blur-2xl" />
-          <VideoPreviewFrame caption="Preview outfit custom Anda sebelum produksi" />
+          <VideoPreviewFrame
+            label={heroMedia?.title}
+            caption={heroMedia?.caption ?? "Preview outfit custom Anda sebelum produksi"}
+            mediaUrl={heroMedia?.signedUrl}
+            mediaType={heroMedia?.mediaType}
+          />
         </div>
       </div>
     </section>
