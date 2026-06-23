@@ -88,6 +88,8 @@ export const fetchAllMedia = async (): Promise<MediaItem[]> => {
 };
 
 const resolveMediaType = (file: File): MediaType | null => {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (extension === "svg") return "image";
   if (file.type.startsWith("image/")) return "image";
   if (file.type.startsWith("video/")) return "video";
   return null;
@@ -117,7 +119,11 @@ export const uploadMedia = async ({ file, title, description }: UploadParams): P
 
   const { error: uploadError } = await supabase.storage
     .from(MEDIA_BUCKET)
-    .upload(storagePath, file, { cacheControl: "3600", upsert: false });
+    .upload(storagePath, file, {
+      cacheControl: "3600",
+      contentType: extension === "svg" ? "image/svg+xml" : file.type || undefined,
+      upsert: false,
+    });
   if (uploadError) throw uploadError;
 
   const { error: insertError } = await supabase.from("media_items").insert({

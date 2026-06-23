@@ -43,7 +43,7 @@ export function AdminMedia() {
   const handleUpload = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) {
-      toast.error("Pilih file foto atau video dulu.");
+      toast.error("Pilih file foto, SVG, atau video dulu.");
       return;
     }
     if (!title.trim()) {
@@ -111,7 +111,7 @@ export function AdminMedia() {
   return (
     <AdminLayout
       title="Media library"
-      description="Kelola foto & video yang tampil di galeri halaman depan."
+      description="Kelola foto, SVG, dan video yang tampil di galeri halaman depan."
     >
       {/* Form unggah */}
       <form
@@ -147,12 +147,12 @@ export function AdminMedia() {
           <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-champagne/40 bg-ivory/60 px-4 py-3 text-sm text-mink transition hover:border-champagne">
             <ImagePlus className="h-5 w-5 text-champagne" />
             <span className="truncate">
-              {file ? file.name : "Pilih foto atau video"}
+              {file ? file.name : "Pilih foto, SVG, atau video"}
             </span>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,video/*"
+              accept="image/*,.svg,video/*"
               className="hidden"
               onChange={(event) => setFile(event.target.files?.[0] ?? null)}
             />
@@ -257,7 +257,7 @@ export function AdminMedia() {
                         <p className="mt-0.5 text-xs text-mink">{item.description}</p>
                       )}
                       <span className="mt-1 inline-block text-[11px] uppercase tracking-wide text-champagne">
-                        {item.mediaType === "video" ? "Video" : "Foto"}
+                        {item.mediaType === "video" ? "Video" : "Gambar"}
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
