@@ -1,0 +1,144 @@
+﻿import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { fetchActiveHeroMedia, type HeroMedia } from "@/lib/hero-media-service";
+
+const heroStats = [
+  { value: "9+", label: "Kategori busana" },
+  { value: "10+", label: "Pilihan bahan" },
+  { value: "AI", label: "Style advisor" },
+];
+
+export function HeroSection() {
+  const [heroMedia, setHeroMedia] = useState<HeroMedia | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadHeroMedia = async () => {
+      try {
+        const data = await fetchActiveHeroMedia();
+        if (active) setHeroMedia(data);
+      } catch (error) {
+        console.warn("[HeroSection] Failed to load hero media", error);
+        if (active) setHeroMedia(null);
+      }
+    };
+
+    void loadHeroMedia();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const isVideoPreview = heroMedia?.mediaType === "video";
+  const mediaLabel = heroMedia?.title ?? "LUCE Studio Preview";
+  const mediaCaption = heroMedia?.caption ?? "Preview outfit custom Anda sebelum produksi";
+
+  return (
+    <section className="relative isolate overflow-hidden bg-ivory">
+      <div className="absolute inset-0 -z-10 bg-silk" />
+      <div className="absolute left-[-10rem] top-12 -z-10 h-80 w-80 rounded-full bg-blush/40 blur-3xl" />
+      <div className="absolute right-[-12rem] top-20 -z-10 h-96 w-96 rounded-full bg-champagne/20 blur-3xl" />
+      <div className="absolute bottom-[-10rem] left-1/3 -z-10 h-96 w-96 rounded-full bg-sage/30 blur-3xl" />
+
+      <div className="container py-6 md:py-8">
+        <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden rounded-[2rem] border border-champagne/20 bg-charcoal shadow-luxe md:rounded-[2.75rem]">
+          {heroMedia?.signedUrl ? (
+            isVideoPreview ? (
+              <video
+                src={heroMedia.signedUrl}
+                className="absolute inset-0 h-full w-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                aria-label={mediaLabel}
+              />
+            ) : (
+              <img
+                src={heroMedia.signedUrl}
+                alt={mediaLabel}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-ivory via-sand to-champagne/30">
+              <div className="absolute bottom-0 left-1/2 h-[82%] w-[28%] -translate-x-1/2 rounded-t-[140px] bg-gradient-to-b from-white/80 to-champagne/35" />
+            </div>
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/80 via-charcoal/45 to-charcoal/5" />
+          <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-charcoal/10" />
+
+          <div className="relative z-10 flex min-h-[calc(100vh-6rem)] flex-col justify-between p-6 sm:p-8 md:p-12 lg:p-16">
+            <div className="flex items-center justify-between gap-4">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-white shadow-soft backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5 text-champagne" />
+                Busana Muslim Custom Berbasis AI
+              </span>
+
+              <span className="hidden rounded-full border border-white/25 bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-white/85 backdrop-blur sm:inline-flex">
+                {isVideoPreview ? "Video Hero" : "Hero Preview"}
+              </span>
+            </div>
+
+            <div className="max-w-3xl py-12 md:py-16">
+              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.28em] text-champagne">
+                {mediaLabel}
+              </p>
+
+              <h1 className="font-display text-5xl font-semibold leading-[0.95] tracking-tight text-white drop-shadow-sm sm:text-6xl lg:text-7xl">
+                Rancang Gamis Impianmu dengan{" "}
+                <span className="text-champagne">LUCE AI</span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/82 sm:text-lg">
+                Pilih model, bahan, warna, dan ukuran. Lihat preview video realistis sebelum
+                busana diproduksi, jadi hasil akhirnya lebih yakin dan lebih personal.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link to="/customize">
+                  <Button variant="gold" size="lg" className="shadow-luxe">
+                    Mulai Desain
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link to="/collections">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20"
+                  >
+                    Lihat Koleksi
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div className="max-w-xl rounded-3xl border border-white/20 bg-white/14 px-5 py-4 text-sm leading-relaxed text-white/82 shadow-soft backdrop-blur">
+                {mediaCaption}
+              </div>
+
+              <dl className="grid grid-cols-3 gap-3">
+                {heroStats.map((item) => (
+                  <div
+                    key={item.label}
+                    className="min-w-24 rounded-2xl border border-white/20 bg-white/14 px-4 py-3 text-white shadow-soft backdrop-blur"
+                  >
+                    <dt className="font-display text-3xl font-semibold">{item.value}</dt>
+                    <dd className="mt-1 text-[11px] leading-snug text-white/75">{item.label}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
