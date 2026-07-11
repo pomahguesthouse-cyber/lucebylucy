@@ -46,7 +46,7 @@ export function SizeGuideSection() {
           Ukuranmu, desainmu, gayamu.
         </h2>
         <p className="mt-3 text-mink">
-          Gunakan ukuran standar atau masukkan ukuran tubuh sendiri. Sistem LUCE akan membantu menyesuaikan setiap detail busana untukmu.
+          Gunakan ukuran standar atau masukkan ukuran tubuh sendiri. Sistem Luse by lucy akan membantu menyesuaikan setiap detail busana untukmu.
         </p>
         <Button
           className="mt-6"
