@@ -122,7 +122,7 @@ export function AdminLogin() {
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="email"
                     required
-                    className="h-13 w-full rounded-2xl border border-[#d7c5b5] bg-white py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-mink/60 focus:border-champagne focus:ring-2 focus:ring-champagne/20"
+                    className="h-12 w-full rounded-2xl border border-[#d7c5b5] bg-white px-4 pl-11 text-sm outline-none transition placeholder:text-mink/60 focus:border-champagne focus:ring-2 focus:ring-champagne/20"
                     placeholder="nama@email.com"
                   />
                 </div>
@@ -141,7 +141,7 @@ export function AdminLogin() {
                     onChange={(event) => setPassword(event.target.value)}
                     autoComplete="current-password"
                     required
-                    className="h-13 w-full rounded-2xl border border-[#d7c5b5] bg-white py-3 pl-11 pr-12 text-sm outline-none transition placeholder:text-mink/60 focus:border-champagne focus:ring-2 focus:ring-champagne/20"
+                    className="h-12 w-full rounded-2xl border border-[#d7c5b5] bg-white pl-11 pr-12 text-sm outline-none transition placeholder:text-mink/60 focus:border-champagne focus:ring-2 focus:ring-champagne/20"
                     placeholder="Masukkan password"
                   />
                   <button
