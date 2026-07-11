@@ -28,7 +28,7 @@ export function Footer() {
     <footer className="border-t border-champagne/10 bg-white/40">
       <div className="container grid gap-8 py-12 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
         <div>
-          <span className="font-display text-4xl tracking-[0.12em]">LUCE</span>
+          <span className="font-display text-4xl tracking-[0.12em]">Luse by lucy</span>
           <p className="mt-4 max-w-sm text-mink">
             Premium modest fashion technology brand untuk custom busana yang lebih personal, jelas, dan elegan.
           </p>
@@ -69,7 +69,7 @@ export function Footer() {
       </div>
       <div className="border-t border-champagne/10 py-5">
         <p className="container text-center text-xs text-mink">
-          © {currentYear} LUCE Custom Studio. All rights reserved.
+          © {currentYear} Luse by lucy. All rights reserved.
         </p>
       </div>
     </footer>
