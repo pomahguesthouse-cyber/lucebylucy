@@ -18,7 +18,7 @@ import { useCustomizerStore } from "@/store/customizer-store";
 import { buildAIRecommendation } from "@/lib/ai-recommendation";
 import { buildVideoPrompt } from "@/lib/video-prompt";
 import { getCategoryName } from "@/lib/customizer-selectors";
-import { askLuceDesigner } from "@/lib/luce-agent-api";
+import { askLuseDesigner } from "@/lib/luse-agent-api";
 
 const steps = [
   "Kategori",
@@ -78,7 +78,7 @@ export function Customize() {
     ].join("\n");
 
     try {
-      const result = await askLuceDesigner(prompt, controller.signal);
+      const result = await askLuseDesigner(prompt, controller.signal);
       setDesignerAnswer(result.answer);
     } catch (error) {
       if (controller.signal.aborted) return;
