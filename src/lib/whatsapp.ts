@@ -63,7 +63,7 @@ export function buildWhatsAppMessage(input: WhatsAppOrderInput): string {
     input.sizeType === "standard" ? `Standar (${input.selectedSize})` : "Custom measurement";
 
   const lines = [
-    "Halo LUCE, saya ingin konsultasi/pesan desain custom berikut:",
+    "Halo Luse by lucy, saya ingin konsultasi/pesan desain custom berikut:",
     "",
     `Nama: ${input.customerName || "-"}`,
     `Kategori: ${input.categoryName || "-"}`,
