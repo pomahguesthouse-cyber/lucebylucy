@@ -7,13 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        ivory: "#fbf7ef",
-        porcelain: "#fffdf8",
-        champagne: "#c89b52",
-        sand: "#eadfcf",
+        ivory: "#fbf8f2",
+        porcelain: "#fffdf9",
+        champagne: "#bd9d82",
+        sand: "#eadfce",
         sage: "#c5c9b6",
         charcoal: "#151412",
-        mink: "#7e756b",
+        mink: "#756b62",
         blush: "#e7c5c0",
       },
       fontFamily: {
@@ -28,7 +28,7 @@ export default {
         luxe: "28px",
       },
       backgroundImage: {
-        "silk": "radial-gradient(circle at 12% 15%, rgba(255,255,255,.9), transparent 22rem), linear-gradient(135deg, #fffaf0 0%, #f3e7d8 42%, #fffdf8 100%)",
+        "silk": "radial-gradient(circle at 12% 15%, rgba(255,255,255,.92), transparent 22rem), linear-gradient(135deg, #fdf9f2 0%, #efe4d6 42%, #fffdf9 100%)",
       },
     },
   },
