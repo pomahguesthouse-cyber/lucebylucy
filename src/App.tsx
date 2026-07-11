@@ -27,11 +27,11 @@ import { AdminHeroMedia } from "@/pages/admin/AdminHeroMedia";
 import { AdminOrders } from "@/pages/admin/AdminOrders";
 import { AdminProductionNotes } from "@/pages/admin/AdminProductionNotes";
 import { AdminSettings } from "@/pages/admin/AdminSettings";
-import { LuceAssistantWidget } from "@/components/agent/LuceAssistantWidget";
+import { LuseAssistantWidget } from "@/components/agent/LuseAssistantWidget";
 
 function PublicAssistant() {
   const { pathname } = useLocation();
-  return pathname.startsWith("/admin") ? null : <LuceAssistantWidget />;
+  return pathname.startsWith("/admin") ? null : <LuseAssistantWidget />;
 }
 
 function App() {
