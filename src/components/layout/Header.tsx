@@ -18,15 +18,14 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-champagne/15 bg-ivory/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-champagne/20 bg-ivory/95 shadow-[0_8px_32px_rgba(76,55,35,0.04)] backdrop-blur">
       <div className="container flex h-16 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="font-display text-2xl font-semibold tracking-wide text-charcoal">
-            LUCE
-          </span>
-          <span className="hidden text-xs uppercase tracking-[0.3em] text-mink sm:inline">
-            Custom Studio
-          </span>
+        <Link to="/" className="flex shrink-0 items-center" onClick={() => setOpen(false)}>
+          <img
+            src="/luse-logo.png"
+            alt="LUSE by Lucy"
+            className="h-12 w-auto max-w-[190px] object-contain object-left sm:h-14 sm:max-w-[220px]"
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
