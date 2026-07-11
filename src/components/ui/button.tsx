@@ -9,7 +9,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-charcoal text-white shadow-soft hover:-translate-y-0.5 hover:bg-black",
         outline: "border border-champagne/55 bg-white/65 text-charcoal hover:-translate-y-0.5 hover:bg-white",
-        gold: "bg-champagne text-white shadow-soft hover:-translate-y-0.5 hover:bg-[#b8893f]",
+        gold: "bg-champagne text-white shadow-soft hover:-translate-y-0.5 hover:bg-[#a9876c]",
         ghost: "bg-white/75 text-charcoal hover:bg-white",
       },
       size: {
