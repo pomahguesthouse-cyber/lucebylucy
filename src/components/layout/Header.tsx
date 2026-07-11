@@ -22,7 +22,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <span className="font-display text-2xl font-semibold tracking-wide text-charcoal">
-            LUCE
+            Luse by lucy
           </span>
           <span className="hidden text-xs uppercase tracking-[0.3em] text-mink sm:inline">
             Custom Studio
