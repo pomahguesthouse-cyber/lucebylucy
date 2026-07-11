@@ -39,7 +39,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ title, description, children }: AdminLayoutProps) {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user, role } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -51,8 +51,8 @@ export function AdminLayout({ title, description, children }: AdminLayoutProps) 
       <div className="flex w-full flex-col lg:flex-row">
         <aside className="flex flex-col border-b border-champagne/15 bg-porcelain lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between p-5">
-            <Link to="/" className="font-display text-xl font-semibold text-charcoal">
-              Luse by lucy <span className="text-xs text-mink">Admin</span>
+            <Link to="/" className="flex items-center gap-2">
+              <img src="/luse-logo.png" alt="LUSE by Lucy" className="h-12 w-auto max-w-[180px] object-contain object-left" />
             </Link>
           </div>
           <nav className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:overflow-visible lg:pb-5">
@@ -73,6 +73,10 @@ export function AdminLayout({ title, description, children }: AdminLayoutProps) 
               </NavLink>
             ))}
           </nav>
+          <div className="mx-3 mb-3 hidden rounded-2xl border border-champagne/20 bg-white/70 p-3 lg:block">
+            <span className="inline-flex rounded-full bg-champagne/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#9b765d]">{role ?? "Admin"}</span>
+            <p className="mt-2 truncate text-xs font-medium text-charcoal">{user?.email}</p>
+          </div>
           <button
             type="button"
             onClick={handleSignOut}
