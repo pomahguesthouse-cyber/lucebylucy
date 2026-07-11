@@ -12,7 +12,7 @@ interface VideoPreviewFrameProps {
 
 // Frame preview butik untuk menampilkan placeholder video model
 export function VideoPreviewFrame({
-  label = "LUCE Studio Preview",
+  label = "Luse by lucy Studio Preview",
   caption = "Model mengenakan outfit custom Anda",
   className,
   showPlay = true,
