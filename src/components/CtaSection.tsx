@@ -10,7 +10,7 @@ export function CtaSection() {
       <div data-reveal className="relative overflow-hidden rounded-[34px] bg-gradient-to-br from-[#d7c2aa] via-[#f5eadf] to-white p-10 shadow-luxe md:p-16">
         <SilkBackground subtle />
         <div className="relative max-w-2xl">
-          <Badge>LUCE Custom Studio</Badge>
+          <Badge>Luse by lucy</Badge>
           <h2 className="mt-5 font-display text-4xl leading-tight tracking-[-0.05em] md:text-6xl">
             Siap merancang busana modest impianmu?
           </h2>
