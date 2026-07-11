@@ -12,14 +12,14 @@ export function About() {
     <SiteLayout>
       <PageHero
         eyebrow="Tentang"
-        title="Tentang LUCE Custom Studio"
-        description="LUCE adalah butik fashion digital dengan asisten AI pribadi untuk merancang busana modest custom yang elegan."
+        title="Tentang Luse by lucy"
+        description="Luse by lucy adalah butik fashion digital dengan asisten AI pribadi untuk merancang busana modest custom yang elegan."
       />
       <section className="container py-12">
         <div className="mx-auto max-w-3xl space-y-5 text-mink">
           <p>
             Kami percaya setiap perempuan berhak tampil anggun dengan busana yang benar-benar
-            sesuai dengan dirinya. LUCE memadukan sentuhan personal seorang penata busana dengan
+            sesuai dengan dirinya. Luse by lucy memadukan sentuhan personal seorang penata busana dengan
             kemudahan teknologi AI, sehingga Anda dapat memilih model, bahan, warna, dan ukuran
             dengan percaya diri.
           </p>
