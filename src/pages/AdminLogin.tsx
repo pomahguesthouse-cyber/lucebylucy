@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -119,7 +119,7 @@ export function AdminLogin() {
                     id="admin-email"
                     type="email"
                     value={email}
-                    onChange={(event) => setEmail(event.target.value)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
                     autoComplete="email"
                     required
                     className="h-12 w-full rounded-2xl border border-[#d7c5b5] bg-white px-4 pl-11 text-sm outline-none transition placeholder:text-mink/60 focus:border-champagne focus:ring-2 focus:ring-champagne/20"
@@ -138,7 +138,7 @@ export function AdminLogin() {
                     id="admin-password"
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
                     autoComplete="current-password"
                     required
                     className="h-12 w-full rounded-2xl border border-[#d7c5b5] bg-white pl-11 pr-12 text-sm outline-none transition placeholder:text-mink/60 focus:border-champagne focus:ring-2 focus:ring-champagne/20"
