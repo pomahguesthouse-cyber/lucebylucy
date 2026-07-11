@@ -15,7 +15,7 @@ export const navItems = [
   "Custom Studio",
   "Bahan",
   "Size Guide",
-  "Tentang LUCE",
+  "Tentang Luse by lucy",
   "Kontak",
 ];
 
@@ -79,7 +79,7 @@ export const testimonials: [string, string][] = [
   ["Fatimah Zahra", "Pesan untuk keluarga jadi lebih mudah. Semua bisa custom ukuran dan warnanya juga cantik."],
 ];
 
-export const WHATSAPP_URL = "https://wa.me/6281200000000?text=Halo%20LUCE%2C%20saya%20tertarik%20untuk%20custom%20busana";
+export const WHATSAPP_URL = "https://wa.me/6281200000000?text=Halo%20Luse by lucy%2C%20saya%20tertarik%20untuk%20custom%20busana";
 
 export const modelOptions = ["Gamis A-Line", "Abaya", "Tunik", "Family Set"];
 export const fabricOptions = ["Toyobo", "Ceruty", "Satin Silk", "Linen", "Rayon"];
