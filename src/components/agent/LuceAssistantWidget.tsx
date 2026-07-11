@@ -14,7 +14,7 @@ const WELCOME: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "Halo Kak, saya LUCE Assistant. Saya bisa membantu memilih model, bahan, warna, ukuran, dan menjelaskan proses custom.",
+    "Halo Kak, saya Luse by lucy Assistant. Saya bisa membantu memilih model, bahan, warna, ukuran, dan menjelaskan proses custom.",
 };
 
 const suggestions = [
@@ -100,7 +100,7 @@ export function LuceAssistantWidget() {
             content:
               error instanceof Error
                 ? error.message
-                : "LUCE Assistant sementara tidak tersedia.",
+                : "Luse by lucy Assistant sementara tidak tersedia.",
           } as ChatMessage,
         ].slice(-20),
       );
@@ -123,7 +123,7 @@ export function LuceAssistantWidget() {
       {open && (
         <section
           role="dialog"
-          aria-label="Percakapan dengan LUCE Assistant"
+          aria-label="Percakapan dengan Luse by lucy Assistant"
           className="mb-3 flex h-[min(650px,calc(100vh-110px))] w-[min(390px,calc(100vw-32px))] flex-col overflow-hidden rounded-[28px] border border-champagne/25 bg-ivory shadow-[0_24px_80px_rgba(48,39,30,0.22)]"
         >
           <header className="flex items-center justify-between border-b border-champagne/15 bg-white/80 px-5 py-4 backdrop-blur">
@@ -132,7 +132,7 @@ export function LuceAssistantWidget() {
                 <Sparkles className="h-5 w-5 text-champagne" />
               </span>
               <div>
-                <h2 className="font-display text-lg font-semibold text-charcoal">LUCE Assistant</h2>
+                <h2 className="font-display text-lg font-semibold text-charcoal">Luse by lucy Assistant</h2>
                 <p className="text-[11px] text-mink">Konsultasi modest fashion</p>
               </div>
             </div>
@@ -148,7 +148,7 @@ export function LuceAssistantWidget() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Tutup LUCE Assistant"
+                aria-label="Tutup Luse by lucy Assistant"
                 className="rounded-full p-2 text-mink transition hover:bg-champagne/10 hover:text-charcoal"
               >
                 <X className="h-5 w-5" />
@@ -179,7 +179,7 @@ export function LuceAssistantWidget() {
               <div className="flex justify-start">
                 <div className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-champagne/15 bg-white/85 px-4 py-3 text-sm text-mink">
                   <Loader2 className="h-4 w-4 animate-spin text-champagne" />
-                  LUCE sedang merangkai jawaban…
+                  Luse by lucy sedang merangkai jawaban…
                 </div>
               </div>
             )}
@@ -232,7 +232,7 @@ export function LuceAssistantWidget() {
                 rows={1}
                 maxLength={2000}
                 placeholder="Tulis pertanyaan Kak…"
-                aria-label="Pesan untuk LUCE Assistant"
+                aria-label="Pesan untuk Luse by lucy Assistant"
                 className="max-h-28 min-h-10 flex-1 resize-none bg-transparent px-1 py-2 text-sm text-charcoal outline-none placeholder:text-mink/60"
               />
               <button
@@ -245,7 +245,7 @@ export function LuceAssistantWidget() {
               </button>
             </div>
             <p className="mt-2 text-center text-[10px] text-mink/75">
-              AI dapat keliru. Harga dan ketersediaan dikonfirmasi tim LUCE.
+              AI dapat keliru. Harga dan ketersediaan dikonfirmasi tim Luse by lucy.
             </p>
           </form>
         </section>
@@ -254,12 +254,12 @@ export function LuceAssistantWidget() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        aria-label={open ? "Tutup LUCE Assistant" : "Buka LUCE Assistant"}
+        aria-label={open ? "Tutup Luse by lucy Assistant" : "Buka Luse by lucy Assistant"}
         aria-expanded={open}
         className="ml-auto flex h-14 items-center gap-2 rounded-full bg-charcoal px-5 text-sm font-semibold text-white shadow-[0_12px_35px_rgba(35,31,27,0.3)] transition hover:-translate-y-0.5 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne motion-reduce:transform-none"
       >
         {open ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
-        <span>{open ? "Tutup" : "Tanya LUCE"}</span>
+        <span>{open ? "Tutup" : "Tanya Luse by lucy"}</span>
       </button>
     </div>
   );
