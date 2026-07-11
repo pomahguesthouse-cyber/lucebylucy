@@ -52,7 +52,7 @@ export function AdminLayout({ title, description, children }: AdminLayoutProps) 
         <aside className="flex flex-col border-b border-champagne/15 bg-porcelain lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between p-5">
             <Link to="/" className="font-display text-xl font-semibold text-charcoal">
-              LUCE <span className="text-xs text-mink">Admin</span>
+              Luse by lucy <span className="text-xs text-mink">Admin</span>
             </Link>
           </div>
           <nav className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:overflow-visible lg:pb-5">
