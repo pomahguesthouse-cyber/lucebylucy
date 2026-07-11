@@ -14,7 +14,7 @@ export function AdminHeroMedia() {
   const [item, setItem] = useState<HeroMedia | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [title, setTitle] = useState("LUCE Studio Preview");
+  const [title, setTitle] = useState("Luse by lucy Studio Preview");
   const [caption, setCaption] = useState("Preview outfit custom Anda sebelum produksi");
   const [isActive, setIsActive] = useState(true);
   const [file, setFile] = useState<File | null>(null);
@@ -87,7 +87,7 @@ export function AdminHeroMedia() {
       setItem(null);
       setFile(null);
       setFilePreview(null);
-      setTitle("LUCE Studio Preview");
+      setTitle("Luse by lucy Studio Preview");
       setCaption("Preview outfit custom Anda sebelum produksi");
       setIsActive(true);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -123,7 +123,7 @@ export function AdminHeroMedia() {
                 </div>
               )}
               <div className="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne">
-                {title || "LUCE Studio Preview"}
+                {title || "Luse by lucy Studio Preview"}
               </div>
               <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/75 px-4 py-3 backdrop-blur">
                 <p className="text-sm font-medium text-charcoal">
@@ -143,7 +143,7 @@ export function AdminHeroMedia() {
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
-                placeholder="LUCE Studio Preview"
+                placeholder="Luse by lucy Studio Preview"
               />
             </div>
 
