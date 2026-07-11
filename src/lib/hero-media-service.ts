@@ -135,7 +135,7 @@ export const saveHeroMedia = async ({
 
   const payload = {
     slot: HERO_SLOT,
-    title: title.trim() || "LUCE Studio Preview",
+    title: title.trim() || "Luse by lucy Studio Preview",
     caption: caption.trim() || "Preview outfit custom Anda sebelum produksi",
     storage_path: storagePath,
     media_type: mediaType ?? currentMediaType ?? "image",
