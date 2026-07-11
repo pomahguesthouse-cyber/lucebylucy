@@ -15,9 +15,12 @@ interface AuthContextValue {
   session: Session | null;
   user: User | null;
   isAdmin: boolean;
+  role: "superadmin" | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
+
+export const SUPERADMIN_EMAIL = "ical.smg@gmail.com";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -25,18 +28,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<"superadmin" | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const checkAdmin = useCallback(async (userId: string) => {
+  const checkAdmin = useCallback(async (nextUser: User) => {
+    const normalizedEmail = nextUser.email?.trim().toLowerCase();
+    if (normalizedEmail !== SUPERADMIN_EMAIL) {
+      setIsAdmin(false);
+      setRole(null);
+      return;
+    }
+
     const supabase = await getBackendClient();
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
+      .eq("user_id", nextUser.id)
       .eq("role", "admin")
       .maybeSingle();
 
-    setIsAdmin(!error && data?.role === "admin");
+    const authorized = !error && data?.role === "admin";
+    setIsAdmin(authorized);
+    setRole(authorized ? "superadmin" : null);
   }, []);
 
   useEffect(() => {
@@ -57,10 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (nextSession?.user) {
         // Tunda pemanggilan Supabase lain untuk mencegah deadlock
         setTimeout(() => {
-          void checkAdmin(nextSession.user.id);
+          void checkAdmin(nextSession.user);
         }, 0);
       } else {
         setIsAdmin(false);
+        setRole(null);
       }
       setLoading(false);
     });
@@ -74,13 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         if (currentSession?.user) {
-          void checkAdmin(currentSession.user.id);
+          void checkAdmin(currentSession.user);
         }
       } catch {
         if (!active) return;
         setSession(null);
         setUser(null);
         setIsAdmin(false);
+        setRole(null);
       } finally {
         if (active) setLoading(false);
       }
@@ -98,11 +113,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = await getBackendClient();
     await supabase.auth.signOut();
     setIsAdmin(false);
+    setRole(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ session, user, isAdmin, loading, signOut }),
-    [session, user, isAdmin, loading, signOut],
+    () => ({ session, user, isAdmin, role, loading, signOut }),
+    [session, user, isAdmin, role, loading, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
