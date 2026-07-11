@@ -7,14 +7,14 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export function Contact() {
   const waLink = buildWhatsAppLink(
-    "Halo LUCE, saya ingin bertanya tentang layanan custom design.",
+    "Halo Luse by lucy, saya ingin bertanya tentang layanan custom design.",
   );
 
   return (
     <SiteLayout>
       <PageHero
         eyebrow="Kontak"
-        title="Hubungi LUCE"
+        title="Hubungi Luse by lucy"
         description="Punya pertanyaan tentang desain, bahan, atau pesanan? Tim kami siap membantu."
       />
       <section className="container grid gap-8 py-12 lg:grid-cols-2">
