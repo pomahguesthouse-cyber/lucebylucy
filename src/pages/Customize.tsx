@@ -153,7 +153,7 @@ export function Customize() {
       <div className="container py-10 md:py-14">
         <div className="mb-8">
           <h1 className="font-display text-3xl font-semibold text-charcoal sm:text-4xl">
-            LUCE Custom Studio
+            Luse by lucy
           </h1>
           <p className="mt-2 text-mink">
             Rancang busana modest Anda langkah demi langkah, lalu lihat preview sebelum memesan.
@@ -257,7 +257,7 @@ export function Customize() {
                         Desain berhasil dikirim
                       </h3>
                       <p className="mt-2 text-sm text-mink">
-                        Tim LUCE akan meninjau desain Anda. Lanjutkan ke WhatsApp untuk
+                        Tim Luse by lucy akan meninjau desain Anda. Lanjutkan ke WhatsApp untuk
                         konfirmasi bahan, harga final, dan estimasi produksi.
                       </p>
                       <div className="mt-5 flex justify-center">
