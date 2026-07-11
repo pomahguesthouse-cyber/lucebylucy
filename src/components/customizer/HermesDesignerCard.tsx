@@ -20,7 +20,7 @@ export function HermesDesignerCard({
         <div className="flex items-center gap-3 text-charcoal">
           <Loader2 className="h-5 w-5 animate-spin text-champagne" />
           <div>
-            <p className="text-sm font-semibold">LUCE Fashion Designer sedang bekerja</p>
+            <p className="text-sm font-semibold">Luse by lucy Fashion Designer sedang bekerja</p>
             <p className="mt-1 text-xs text-mink">Merangkai model, bahan, warna, dan detail pilihan Kak…</p>
           </div>
         </div>
@@ -42,7 +42,7 @@ export function HermesDesignerCard({
           </span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-champagne">
-              LUCE Fashion Designer
+              Luse by lucy Fashion Designer
             </p>
             <h3 className="font-display text-xl font-semibold text-charcoal">
               Rekomendasi personal untuk Kak
