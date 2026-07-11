@@ -19,7 +19,7 @@ export function Collections() {
     <SiteLayout>
       <PageHero
         eyebrow="Koleksi"
-        title="Jelajahi koleksi LUCE"
+        title="Jelajahi koleksi Luse by lucy"
         description="Temukan model dasar favorit Anda, lalu lanjutkan untuk menyesuaikan bahan, warna, dan ukuran di customizer."
       />
       <section className="container py-12">

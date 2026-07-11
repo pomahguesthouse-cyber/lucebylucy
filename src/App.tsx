@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { RequireAdmin } from "@/components/admin/RequireAdmin";
 import { Home } from "@/pages/Home";
@@ -27,11 +27,18 @@ import { AdminHeroMedia } from "@/pages/admin/AdminHeroMedia";
 import { AdminOrders } from "@/pages/admin/AdminOrders";
 import { AdminProductionNotes } from "@/pages/admin/AdminProductionNotes";
 import { AdminSettings } from "@/pages/admin/AdminSettings";
+import { LuseAssistantWidget } from "@/components/agent/LuseAssistantWidget";
+
+function PublicAssistant() {
+  const { pathname } = useLocation();
+  return pathname.startsWith("/admin") ? null : <LuseAssistantWidget />;
+}
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <PublicAssistant />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collections" element={<Collections />} />

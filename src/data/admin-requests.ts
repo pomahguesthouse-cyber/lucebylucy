@@ -2,7 +2,7 @@ import type { DesignRequest } from "@/types";
 
 export const designRequests: DesignRequest[] = [
   {
-    id: "LUCE-2406-001",
+    id: "Luse by lucy-2406-001",
     customerName: "Aulia Rahmawati",
     category: "Gamis",
     productName: "Gamis A-Line Elegance",
@@ -30,7 +30,7 @@ export const designRequests: DesignRequest[] = [
     createdAt: "2026-06-18",
   },
   {
-    id: "LUCE-2406-002",
+    id: "Luse by lucy-2406-002",
     customerName: "Nadia Putri",
     category: "Abaya",
     productName: "Abaya Flow Premium",
@@ -58,7 +58,7 @@ export const designRequests: DesignRequest[] = [
     createdAt: "2026-06-20",
   },
   {
-    id: "LUCE-2406-003",
+    id: "Luse by lucy-2406-003",
     customerName: "Rahma Salsabila",
     category: "Dress",
     productName: "Dress Modest Classic",
@@ -86,7 +86,7 @@ export const designRequests: DesignRequest[] = [
     createdAt: "2026-06-21",
   },
   {
-    id: "LUCE-2406-004",
+    id: "Luse by lucy-2406-004",
     customerName: "Salma Hidayah",
     category: "Outer",
     productName: "Outer Raya Layer",

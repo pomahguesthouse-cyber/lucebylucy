@@ -31,7 +31,7 @@ export function TrustSection() {
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
-              Kenapa LUCE
+              Kenapa Luse by lucy
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold text-charcoal sm:text-4xl">
               Pengalaman custom yang tenang & terpercaya

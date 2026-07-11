@@ -7,14 +7,14 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export function Contact() {
   const waLink = buildWhatsAppLink(
-    "Halo LUCE, saya ingin bertanya tentang layanan custom design.",
+    "Halo Luse by lucy, saya ingin bertanya tentang layanan custom design.",
   );
 
   return (
     <SiteLayout>
       <PageHero
         eyebrow="Kontak"
-        title="Hubungi LUCE"
+        title="Hubungi Luse by lucy"
         description="Punya pertanyaan tentang desain, bahan, atau pesanan? Tim kami siap membantu."
       />
       <section className="container grid gap-8 py-12 lg:grid-cols-2">
@@ -30,7 +30,7 @@ export function Contact() {
             <Mail className="h-5 w-5 text-champagne" />
             <div>
               <h3 className="text-sm font-semibold text-charcoal">Email</h3>
-              <p className="text-sm text-mink">hello@lucebylucy.online</p>
+              <p className="text-sm text-mink">hello@lusebylucy.com</p>
             </div>
           </div>
           <div className="flex items-start gap-3 rounded-2xl border border-champagne/15 bg-white/70 p-5 shadow-soft">

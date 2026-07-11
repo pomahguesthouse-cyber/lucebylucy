@@ -11,7 +11,7 @@ export function CollectionsSection() {
     <section id="koleksi" className="container py-8">
       <div className="mb-5 flex items-end justify-between gap-4">
         <h2 data-reveal className="font-display text-4xl tracking-[-0.04em]">
-          Koleksi unggulan LUCE
+          Koleksi unggulan Luse by lucy
         </h2>
         <Button variant="outline" size="sm" className="hidden sm:inline-flex">
           Lihat Semua Koleksi <ArrowRight className="h-4 w-4" />

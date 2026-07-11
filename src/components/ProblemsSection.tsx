@@ -29,7 +29,7 @@ export function ProblemsSection() {
         ))}
       </div>
       <p data-reveal className="mt-8 text-center text-base font-medium text-mink">
-        Di LUCE, kamu tidak hanya memilih produk. Kamu merancang busana yang paling pas untukmu.
+        Di Luse by lucy, kamu tidak hanya memilih produk. Kamu merancang busana yang paling pas untukmu.
       </p>
       <Sparkles className="mx-auto mt-4 h-5 w-5 fill-champagne text-champagne" />
     </section>

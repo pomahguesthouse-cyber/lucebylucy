@@ -37,13 +37,13 @@ export function MediaGallery({ limit }: MediaGalleryProps) {
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
-              Galeri LUCE
+              Galeri Luse by lucy
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold text-charcoal sm:text-4xl">
               Inspirasi busana custom kami
             </h2>
             <p className="mt-4 text-mink">
-              Lihat koleksi foto dan video model mengenakan busana custom LUCE. Galeri ini menjadi
+              Lihat koleksi foto dan video model mengenakan busana custom Luse by lucy. Galeri ini menjadi
               panduan visual sebelum Anda mulai mendesain.
             </p>
           </div>

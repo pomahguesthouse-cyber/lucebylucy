@@ -8,8 +8,8 @@ export function Gallery() {
     <SiteLayout>
       <PageHero
         eyebrow="Galeri"
-        title="Galeri busana custom LUCE"
-        description="Kumpulan foto dan video model mengenakan busana custom hasil desain di LUCE Custom Studio."
+        title="Galeri busana custom Luse by lucy"
+        description="Kumpulan foto dan video model mengenakan busana custom hasil desain di Luse by lucy."
       />
       <MediaGallery />
     </SiteLayout>

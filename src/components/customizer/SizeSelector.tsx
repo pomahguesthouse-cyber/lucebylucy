@@ -88,7 +88,7 @@ export function SizeSelector() {
             ))}
           </div>
           <p className="mt-3 text-xs text-mink">
-            Tim LUCE akan meninjau ukuran Anda sebelum produksi untuk memastikan kenyamanan.
+            Tim Luse by lucy akan meninjau ukuran Anda sebelum produksi untuk memastikan kenyamanan.
           </p>
         </div>
       )}

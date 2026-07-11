@@ -28,7 +28,7 @@ export function buildVideoPrompt({
       : "minimal elegant detailing";
 
   return [
-    "Create a short realistic fashion video of an Indonesian muslim woman model wearing a custom modest outfit by LUCE.",
+    "Create a short realistic fashion video of an Indonesian muslim woman model wearing a custom modest outfit by Luse by lucy.",
     "The model stands in a clean premium fashion studio with soft beige background. She slowly walks forward, turns slightly to show the outfit details, then gently rotates to show the back and side view.",
     "Use elegant modest fashion, premium boutique commercial style, soft cinematic lighting, realistic fabric movement, natural pose, and clean camera movement. Duration 5 to 10 seconds.",
     "Avoid revealing pose, overdramatic movement, unrealistic fabric physics, crowded background, and excessive jewelry.",

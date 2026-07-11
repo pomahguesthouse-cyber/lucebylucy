@@ -25,7 +25,7 @@ export function AdminDashboard() {
   return (
     <AdminLayout
       title="Dashboard"
-      description="Ringkasan aktivitas LUCE Custom Studio."
+      description="Ringkasan aktivitas Luse by lucy."
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

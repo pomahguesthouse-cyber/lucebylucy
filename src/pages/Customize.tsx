@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { ColorSwatchSelector } from "@/components/customizer/ColorSwatchSelector
 import { DesignDetailForm } from "@/components/customizer/DesignDetailForm";
 import { SizeSelector } from "@/components/customizer/SizeSelector";
 import { AIRecommendationCard } from "@/components/customizer/AIRecommendationCard";
+import { HermesDesignerCard } from "@/components/customizer/HermesDesignerCard";
 import { DesignSummaryCard } from "@/components/customizer/DesignSummaryCard";
 import { WhatsAppOrderButton } from "@/components/customizer/WhatsAppOrderButton";
 import { VideoPreviewPanel } from "@/components/video-preview/VideoPreviewPanel";
@@ -17,6 +18,7 @@ import { useCustomizerStore } from "@/store/customizer-store";
 import { buildAIRecommendation } from "@/lib/ai-recommendation";
 import { buildVideoPrompt } from "@/lib/video-prompt";
 import { getCategoryName } from "@/lib/customizer-selectors";
+import { askLuseDesigner } from "@/lib/luse-agent-api";
 
 const steps = [
   "Kategori",
@@ -45,28 +47,73 @@ const stepTitles = [
 export function Customize() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [designerAnswer, setDesignerAnswer] = useState("");
+  const [designerError, setDesignerError] = useState("");
+  const [designerLoading, setDesignerLoading] = useState(false);
+  const designerRequest = useRef<AbortController | null>(null);
   const store = useCustomizerStore();
 
   const categoryName = getCategoryName(store.selectedCategory);
 
-  // Buat rekomendasi AI ketika masuk step rekomendasi
-  useEffect(() => {
-    if (step === 6) {
-      const recommendation = buildAIRecommendation({
+  const requestDesignerRecommendation = async () => {
+    designerRequest.current?.abort();
+    const controller = new AbortController();
+    designerRequest.current = controller;
+    setDesignerLoading(true);
+    setDesignerError("");
+    setDesignerAnswer("");
+
+    const prompt = [
+      "Buat rekomendasi desain modest fashion berdasarkan pilihan berikut.",
+      `Kategori: ${categoryName || "-"}`,
+      `Model: ${store.selectedModel?.name || "-"}`,
+      `Bahan: ${store.selectedFabric?.name || "-"}`,
+      `Warna: ${store.selectedColor?.name || "-"}`,
+      `Cutting: ${store.designDetails.cutting || "-"}`,
+      `Model lengan: ${store.designDetails.sleeveModel || "-"}`,
+      `Panjang busana: ${store.designDetails.outfitLength || "-"}`,
+      `Aksen: ${store.designDetails.accents.join(", ") || "-"}`,
+      `Ukuran: ${store.sizeType === "standard" ? store.selectedSize : "custom measurement"}`,
+      "Berikan nama konsep, evaluasi kombinasi, saran detail, kecocokan acara, dan catatan produksi.",
+    ].join("\n");
+
+    try {
+      const result = await askLuseDesigner(prompt, controller.signal);
+      setDesignerAnswer(result.answer);
+    } catch (error) {
+      if (controller.signal.aborted) return;
+
+      const fallback = buildAIRecommendation({
         categoryName,
         model: store.selectedModel,
         fabric: store.selectedFabric,
         color: store.selectedColor,
         designDetails: store.designDetails,
       });
-      store.setAIRecommendation(recommendation);
+      store.setAIRecommendation(fallback);
+      setDesignerError(
+        error instanceof Error
+          ? `${error.message} Menampilkan rekomendasi lokal.`
+          : "Hermes tidak tersedia. Menampilkan rekomendasi lokal.",
+      );
+    } finally {
+      if (designerRequest.current === controller) {
+        designerRequest.current = null;
+        setDesignerLoading(false);
+      }
     }
-    // Set status preview menjadi siap saat masuk step video
+  };
+
+  useEffect(() => {
+    if (step === 6) void requestDesignerRecommendation();
+
     if (step === 7 && store.videoPreviewState === "empty") {
       store.setVideoPreviewState("ready");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
+
+  useEffect(() => () => designerRequest.current?.abort(), []);
 
   const videoPrompt = useMemo(
     () =>
@@ -106,7 +153,7 @@ export function Customize() {
       <div className="container py-10 md:py-14">
         <div className="mb-8">
           <h1 className="font-display text-3xl font-semibold text-charcoal sm:text-4xl">
-            LUCE Custom Studio
+            Luse by lucy
           </h1>
           <p className="mt-2 text-mink">
             Rancang busana modest Anda langkah demi langkah, lalu lihat preview sebelum memesan.
@@ -143,8 +190,45 @@ export function Customize() {
                   <SizeSelector />
                 </div>
               )}
-              {step === 6 && store.aiRecommendation && (
-                <AIRecommendationCard recommendation={store.aiRecommendation} />
+              {step === 6 && (
+                <div className="space-y-4">
+                  {(designerLoading || designerAnswer) && (
+                    <HermesDesignerCard
+                      answer={designerAnswer}
+                      loading={designerLoading}
+                      error=""
+                      onRetry={() => void requestDesignerRecommendation()}
+                    />
+                  )}
+                  {!designerLoading && !designerAnswer && store.aiRecommendation && (
+                    <>
+                      {designerError && (
+                        <p className="rounded-2xl border border-amber-300/40 bg-amber-50/70 px-4 py-3 text-sm text-amber-900">
+                          {designerError}
+                        </p>
+                      )}
+                      <AIRecommendationCard recommendation={store.aiRecommendation} />
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void requestDesignerRecommendation()}
+                        >
+                          Coba Hermes lagi
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                  {!designerLoading && !designerAnswer && !store.aiRecommendation && (
+                    <HermesDesignerCard
+                      answer=""
+                      loading={false}
+                      error={designerError}
+                      onRetry={() => void requestDesignerRecommendation()}
+                    />
+                  )}
+                </div>
               )}
               {step === 7 && (
                 <div className="space-y-5">
@@ -173,7 +257,7 @@ export function Customize() {
                         Desain berhasil dikirim
                       </h3>
                       <p className="mt-2 text-sm text-mink">
-                        Tim LUCE akan meninjau desain Anda. Lanjutkan ke WhatsApp untuk
+                        Tim Luse by lucy akan meninjau desain Anda. Lanjutkan ke WhatsApp untuk
                         konfirmasi bahan, harga final, dan estimasi produksi.
                       </p>
                       <div className="mt-5 flex justify-center">

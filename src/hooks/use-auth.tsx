@@ -1,4 +1,4 @@
-// Context autentikasi untuk LUCE (dipakai area admin)
+// Context autentikasi untuk Luse by lucy (dipakai area admin)
 import {
   createContext,
   useCallback,

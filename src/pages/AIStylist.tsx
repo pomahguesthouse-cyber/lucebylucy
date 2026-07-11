@@ -14,7 +14,7 @@ const initialMessages: Message[] = [
   {
     id: 0,
     role: "ai",
-    text: "Halo Kak! Saya stylist LUCE. Boleh cerita acara apa yang ingin Kak datangi? Nanti saya bantu pilih model, bahan, dan warna yang elegan. 💛",
+    text: "Halo Kak! Saya stylist Luse by lucy. Boleh cerita acara apa yang ingin Kak datangi? Nanti saya bantu pilih model, bahan, dan warna yang elegan. 💛",
   },
 ];
 
@@ -70,7 +70,7 @@ export function AIStylist() {
               <Sparkles className="h-5 w-5 text-champagne" />
             </span>
             <div>
-              <h1 className="font-display text-2xl font-semibold text-charcoal">AI Stylist LUCE</h1>
+              <h1 className="font-display text-2xl font-semibold text-charcoal">AI Stylist Luse by lucy</h1>
               <p className="text-sm text-mink">Konsultasi gaya modest yang elegan</p>
             </div>
           </div>

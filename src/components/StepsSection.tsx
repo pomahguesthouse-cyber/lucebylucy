@@ -7,7 +7,7 @@ export function StepsSection() {
   return (
     <section className="container py-12">
       <h2 data-reveal className="text-center font-display text-4xl tracking-[-0.045em] md:text-[2.55rem]">
-        Cara pesan busana custom di LUCE
+        Cara pesan busana custom di Luse by lucy
       </h2>
       <div className="mt-8 grid gap-4 md:grid-cols-5">
         {steps.map(([title, text], index) => {

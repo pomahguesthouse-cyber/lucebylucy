@@ -45,7 +45,7 @@ export function Header() {
       >
         <div className="container flex h-[76px] items-center justify-between gap-6">
           <a href="#home" className="leading-none">
-            <span className="font-display text-4xl tracking-[0.12em]">LUCE</span>
+            <span className="font-display text-4xl tracking-[0.12em]">Luse by lucy</span>
             <span className="-mt-1 block text-[0.62rem] font-bold uppercase tracking-[0.45em] text-mink">
               Custom Studio
             </span>
@@ -108,7 +108,7 @@ export function Header() {
         aria-label="Menu navigasi mobile"
       >
         <div className="flex items-center justify-between border-b border-champagne/10 px-6 py-5">
-          <span className="font-display text-2xl tracking-[0.12em]">LUCE</span>
+          <span className="font-display text-2xl tracking-[0.12em]">Luse by lucy</span>
           <button
             onClick={() => setMobileOpen(false)}
             className="grid h-10 w-10 place-items-center rounded-xl border border-champagne/20 bg-white/70"

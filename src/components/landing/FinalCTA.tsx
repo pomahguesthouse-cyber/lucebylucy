@@ -16,7 +16,7 @@ export function FinalCTA() {
                 Mulai rancang busana modest impian Anda hari ini
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm text-porcelain/70">
-                Desain custom, lihat preview, lalu konsultasikan dengan stylist LUCE.
+                Desain custom, lihat preview, lalu konsultasikan dengan stylist Luse by lucy.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Link to="/customize">
@@ -27,7 +27,7 @@ export function FinalCTA() {
                 <Link to="/ai-stylist">
                   <Button variant="outline" size="lg" className="border-porcelain/30 bg-white/10 text-porcelain hover:bg-white/20">
                     <MessageCircle className="h-4 w-4" />
-                    Chat with LUCE stylist
+                    Chat with Luse by lucy stylist
                   </Button>
                 </Link>
               </div>
