@@ -41,7 +41,7 @@ export function VideoPreviewPanel({
           <Sparkles className="h-7 w-7 text-champagne" />
         </motion.div>
         <p className="font-display text-lg text-charcoal">
-          LUCE AI sedang menyiapkan preview outfit Anda…
+          Luse by lucy AI sedang menyiapkan preview outfit Anda…
         </p>
         <div className="h-1.5 w-40 overflow-hidden rounded-full bg-white/60">
           <div className="shimmer h-full w-full" />
