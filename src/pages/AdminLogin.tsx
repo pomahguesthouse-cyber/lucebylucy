@@ -1,4 +1,4 @@
-// Halaman masuk / daftar untuk admin LUCE
+// Halaman masuk / daftar untuk admin Luse by lucy
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -40,7 +40,7 @@ export function AdminLogin() {
           },
         });
         if (error) throw error;
-        toast.success("Akun dibuat. Selamat datang di LUCE Admin, Kak!");
+        toast.success("Akun dibuat. Selamat datang di Luse by lucy Admin, Kak!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -61,7 +61,7 @@ export function AdminLogin() {
       <section className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-silk px-4 py-12 text-charcoal">
         <div className="w-full max-w-md rounded-luxe border border-champagne/20 bg-white/80 p-8 shadow-soft">
         <Link to="/" className="font-display text-2xl font-semibold text-charcoal">
-          LUCE <span className="text-sm text-mink">Admin</span>
+          Luse by lucy <span className="text-sm text-mink">Admin</span>
         </Link>
         <p className="mt-2 text-sm text-mink">
           {mode === "login"
