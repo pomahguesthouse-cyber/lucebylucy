@@ -16,6 +16,7 @@ import {
 } from "@/lib/product-service";
 
 interface ProductFormState {
+  productCode: string;
   name: string;
   categoryId: string;
   description: string;
@@ -28,6 +29,7 @@ interface ProductFormState {
 }
 
 const emptyForm: ProductFormState = {
+  productCode: "",
   name: "",
   categoryId: "",
   description: "",
@@ -38,6 +40,8 @@ const emptyForm: ProductFormState = {
   status: "draft",
   sortOrder: "",
 };
+
+const PRODUCT_CODE_PATTERN = /^[A-Z0-9][A-Z0-9-]{1,39}$/;
 
 export function AdminProducts() {
   const [products, setProducts] = useState<ProductItem[]>([]);
@@ -62,8 +66,7 @@ export function AdminProducts() {
       setProducts(productItems);
       setCategories(categoryItems);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Gagal memuat produk.";
-      toast.error(message);
+      toast.error(error instanceof Error ? error.message : "Gagal memuat produk.");
     } finally {
       setLoading(false);
     }
@@ -81,6 +84,7 @@ export function AdminProducts() {
   const startEdit = (product: ProductItem) => {
     setEditingId(product.id);
     setForm({
+      productCode: product.productCode,
       name: product.name,
       categoryId: product.categoryId ?? "",
       description: product.description ?? "",
@@ -102,6 +106,12 @@ export function AdminProducts() {
       return;
     }
 
+    const productCode = form.productCode.trim().toUpperCase();
+    if (productCode && !PRODUCT_CODE_PATTERN.test(productCode)) {
+      toast.error("Kode produk harus 2-40 karakter dan hanya berisi huruf, angka, atau tanda hubung.");
+      return;
+    }
+
     const basePrice = Number(form.basePrice);
     if (!Number.isFinite(basePrice) || basePrice < 0) {
       toast.error("Harga dasar harus berupa angka nol atau lebih.");
@@ -114,6 +124,7 @@ export function AdminProducts() {
     setSaving(true);
     try {
       const input = {
+        productCode,
         name: form.name,
         categoryId: form.categoryId || null,
         description: form.description,
@@ -130,23 +141,24 @@ export function AdminProducts() {
         toast.success("Produk berhasil diperbarui.");
       } else {
         await createProduct(input);
-        toast.success("Produk berhasil ditambahkan.");
+        toast.success(
+          productCode
+            ? `Produk berhasil ditambahkan dengan kode ${productCode}.`
+            : "Produk berhasil ditambahkan dengan kode otomatis.",
+        );
       }
 
       resetForm();
       await loadData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Gagal menyimpan produk.";
-      toast.error(message);
+      toast.error(error instanceof Error ? error.message : "Gagal menyimpan produk.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (product: ProductItem) => {
-    if (!window.confirm(`Hapus produk "${product.name}"? Tindakan ini tidak dapat dibatalkan.`)) {
-      return;
-    }
+    if (!window.confirm(`Hapus produk "${product.name}" (${product.productCode})?`)) return;
 
     try {
       await deleteProduct(product.id);
@@ -154,15 +166,14 @@ export function AdminProducts() {
       if (editingId === product.id) resetForm();
       await loadData();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Gagal menghapus produk.";
-      toast.error(message);
+      toast.error(error instanceof Error ? error.message : "Gagal menghapus produk.");
     }
   };
 
   return (
     <AdminLayout
       title="Products"
-      description="Kelola produk: tambah, edit, hapus, harga, kategori, gambar, dan status publikasi."
+      description="Kelola kode, produk, harga, kategori, gambar, dan status publikasi."
     >
       <form
         onSubmit={handleSubmit}
@@ -174,7 +185,7 @@ export function AdminProducts() {
               {editingId ? "Edit produk" : "Tambah produk"}
             </h2>
             <p className="mt-1 text-xs text-mink">
-              Produk berstatus Approved dapat ditampilkan pada katalog publik.
+              Kosongkan kode saat membuat produk agar sistem menghasilkan LU-0001, LU-0002, dan seterusnya.
             </p>
           </div>
           {editingId && (
@@ -185,6 +196,28 @@ export function AdminProducts() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">
+              Kode produk
+            </label>
+            <input
+              type="text"
+              value={form.productCode}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  productCode: event.target.value.toUpperCase(),
+                }))
+              }
+              maxLength={40}
+              className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 font-mono text-sm uppercase outline-none focus:border-champagne"
+              placeholder="Otomatis, contoh LU-0079"
+            />
+            <p className="mt-1 text-[11px] text-mink">
+              Opsional. Custom: LUSE-SATIN-01, PYJ-2026-08, dan sejenisnya.
+            </p>
+          </div>
+
           <div className="xl:col-span-2">
             <label className="text-xs font-medium uppercase tracking-wide text-mink">
               Nama produk
@@ -195,13 +228,30 @@ export function AdminProducts() {
               onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
               className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
               placeholder="Contoh: Satin Pajama Set"
+              required
             />
           </div>
 
           <div>
             <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Kategori
+              Harga dasar
             </label>
+            <input
+              type="number"
+              min="0"
+              step="1000"
+              value={form.basePrice}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, basePrice: event.target.value }))
+              }
+              className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
+              placeholder="289000"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">Kategori</label>
             <select
               value={form.categoryId}
               onChange={(event) =>
@@ -218,27 +268,8 @@ export function AdminProducts() {
             </select>
           </div>
 
-          <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Harga dasar
-            </label>
-            <input
-              type="number"
-              min="0"
-              step="1000"
-              value={form.basePrice}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, basePrice: event.target.value }))
-              }
-              className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
-              placeholder="385000"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Deskripsi
-            </label>
+          <div className="md:col-span-2 xl:col-span-3">
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">Deskripsi</label>
             <textarea
               value={form.description}
               onChange={(event) =>
@@ -251,9 +282,7 @@ export function AdminProducts() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Cocok untuk
-            </label>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">Cocok untuk</label>
             <input
               type="text"
               value={form.bestFor}
@@ -261,14 +290,12 @@ export function AdminProducts() {
                 setForm((current) => ({ ...current, bestFor: event.target.value }))
               }
               className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
-              placeholder="Contoh: Tidur malam dan bersantai di rumah"
+              placeholder="Tidur malam dan bersantai"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              URL gambar (opsional)
-            </label>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">URL gambar</label>
             <input
               type="url"
               value={form.imageUrl}
@@ -281,9 +308,7 @@ export function AdminProducts() {
           </div>
 
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Warna pratinjau
-            </label>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">Warna pratinjau</label>
             <div className="mt-1 flex items-center gap-3 rounded-xl border border-champagne/25 bg-white px-3 py-2">
               <input
                 type="color"
@@ -299,9 +324,7 @@ export function AdminProducts() {
           </div>
 
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Status
-            </label>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">Status</label>
             <select
               value={form.status}
               onChange={(event) =>
@@ -319,9 +342,7 @@ export function AdminProducts() {
           </div>
 
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              Urutan
-            </label>
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">Urutan</label>
             <input
               type="number"
               value={form.sortOrder}
@@ -336,17 +357,11 @@ export function AdminProducts() {
           <div className="flex items-end">
             <Button type="submit" variant="gold" className="w-full" disabled={saving}>
               {saving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Menyimpan…
-                </>
+                <><Loader2 className="h-4 w-4 animate-spin" /> Menyimpan…</>
               ) : editingId ? (
-                <>
-                  <Pencil className="h-4 w-4" /> Simpan perubahan
-                </>
+                <><Pencil className="h-4 w-4" /> Simpan perubahan</>
               ) : (
-                <>
-                  <Plus className="h-4 w-4" /> Tambah produk
-                </>
+                <><Plus className="h-4 w-4" /> Tambah produk</>
               )}
             </Button>
           </div>
@@ -363,9 +378,10 @@ export function AdminProducts() {
         </div>
       ) : (
         <div className="overflow-x-auto rounded-luxe border border-champagne/15 bg-white/75 shadow-soft">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[1040px] text-left text-sm">
             <thead className="bg-ivory/80 text-xs uppercase tracking-wide text-mink">
               <tr>
+                <th className="px-4 py-3">Kode</th>
                 <th className="px-4 py-3">Produk</th>
                 <th className="px-4 py-3">Kategori</th>
                 <th className="px-4 py-3">Harga dasar</th>
@@ -377,17 +393,18 @@ export function AdminProducts() {
               {products.map((product) => (
                 <tr key={product.id} className="border-t border-champagne/10 align-middle">
                   <td className="px-4 py-3">
+                    <span className="rounded-lg bg-champagne/10 px-2.5 py-1 font-mono text-xs font-semibold text-charcoal">
+                      {product.productCode}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div
                         className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-champagne/15"
                         style={{ backgroundColor: product.imageColor }}
                       >
                         {product.imageUrl ? (
-                          <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="h-full w-full object-cover"
-                          />
+                          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
                         ) : (
                           <ImageOff className="h-4 w-4 text-charcoal/35" />
                         )}
@@ -408,25 +425,13 @@ export function AdminProducts() {
                   <td className="px-4 py-3 font-semibold text-champagne">
                     {formatPrice(product.basePrice)}
                   </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={product.status} />
-                  </td>
+                  <td className="px-4 py-3"><StatusBadge status={product.status} /></td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEdit(product)}
-                      >
+                      <Button type="button" size="sm" variant="outline" onClick={() => startEdit(product)}>
                         <Pencil className="h-3.5 w-3.5" /> Edit
                       </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => void handleDelete(product)}
-                      >
+                      <Button type="button" size="sm" variant="outline" onClick={() => void handleDelete(product)}>
                         <Trash2 className="h-3.5 w-3.5" /> Hapus
                       </Button>
                     </div>
