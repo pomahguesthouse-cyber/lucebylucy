@@ -13,6 +13,7 @@ interface ProductImageSliderProps {
   autoPlayInterval?: number;
   transition?: "instant" | "fade";
   pauseOnHover?: boolean;
+  compactControls?: boolean;
 }
 
 const normalizeImages = (images: string[]) =>
@@ -35,6 +36,7 @@ export function ProductImageSlider({
   autoPlayInterval = 4000,
   transition = "instant",
   pauseOnHover = true,
+  compactControls = false,
 }: ProductImageSliderProps) {
   const normalizedImages = useMemo(() => normalizeImages(images), [images]);
   const [failedImages, setFailedImages] = useState<string[]>([]);
@@ -144,12 +146,13 @@ export function ProductImageSlider({
                   aria-hidden={!isActive}
                   loading={index === 0 ? loading : "lazy"}
                   className={cn(
-                    "absolute inset-0 h-full w-full object-cover",
+                    "absolute inset-0 h-full w-full object-cover will-change-[opacity,transform]",
                     isActive ? "z-[1] opacity-100" : "z-0 opacity-0",
                     imageClassName,
                   )}
                   style={{
-                    transition: "opacity 700ms ease-in-out, transform 700ms ease-out",
+                    transition:
+                      "opacity 800ms cubic-bezier(0.22, 1, 0.36, 1), transform 800ms ease-out",
                   }}
                   onError={() => markImageFailed(image)}
                 />
@@ -183,9 +186,14 @@ export function ProductImageSlider({
               event.stopPropagation();
               move(-1);
             }}
-            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-charcoal shadow-soft backdrop-blur transition hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne"
+            className={cn(
+              "absolute top-1/2 z-20 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-charcoal shadow-soft backdrop-blur transition hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne",
+              compactControls
+                ? "left-2 hidden h-8 w-8 sm:grid"
+                : "left-3 grid h-10 w-10",
+            )}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className={cn(compactControls ? "h-4 w-4" : "h-5 w-5")} />
           </button>
           <button
             type="button"
@@ -195,12 +203,24 @@ export function ProductImageSlider({
               event.stopPropagation();
               move(1);
             }}
-            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-charcoal shadow-soft backdrop-blur transition hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne"
+            className={cn(
+              "absolute top-1/2 z-20 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-charcoal shadow-soft backdrop-blur transition hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne",
+              compactControls
+                ? "right-2 hidden h-8 w-8 sm:grid"
+                : "right-3 grid h-10 w-10",
+            )}
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className={cn(compactControls ? "h-4 w-4" : "h-5 w-5")} />
           </button>
 
-          <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-2 backdrop-blur">
+          <div
+            className={cn(
+              "absolute left-1/2 z-20 flex -translate-x-1/2 items-center rounded-full bg-black/25 backdrop-blur",
+              compactControls
+                ? "bottom-2 gap-1 px-2 py-1.5 sm:bottom-3 sm:gap-1.5 sm:px-2.5 sm:py-2"
+                : "bottom-3 gap-1.5 px-2.5 py-2",
+            )}
+          >
             {availableImages.map((image, index) => (
               <button
                 key={image}
@@ -213,14 +233,28 @@ export function ProductImageSlider({
                   setActiveIndex(index);
                 }}
                 className={cn(
-                  "h-1.5 rounded-full bg-white/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
-                  index === activeIndex ? "w-5 bg-white" : "w-1.5 hover:bg-white/90",
+                  "rounded-full bg-white/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+                  compactControls ? "h-1" : "h-1.5",
+                  index === activeIndex
+                    ? compactControls
+                      ? "w-4 bg-white"
+                      : "w-5 bg-white"
+                    : compactControls
+                      ? "w-1 hover:bg-white/90"
+                      : "w-1.5 hover:bg-white/90",
                 )}
               />
             ))}
           </div>
 
-          <span className="absolute right-3 top-3 z-20 rounded-full bg-black/35 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+          <span
+            className={cn(
+              "absolute z-20 rounded-full bg-black/35 font-semibold text-white backdrop-blur",
+              compactControls
+                ? "right-2 top-2 px-2 py-1 text-[9px]"
+                : "right-3 top-3 px-2.5 py-1 text-[10px]",
+            )}
+          >
             {activeIndex + 1}/{availableImages.length}
           </span>
         </>

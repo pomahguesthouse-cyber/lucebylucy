@@ -106,13 +106,27 @@ export function Collections() {
 
   return (
     <SiteLayout>
-      <PageHero
-        eyebrow="Koleksi"
-        title="Koleksi sleepwear LUSE"
-        description="Jelajahi produk yang sudah dipublikasikan admin. Geser foto pada kartu untuk melihat detail produk dari berbagai sisi."
-      />
+      <div className="hidden sm:block">
+        <PageHero
+          eyebrow="Koleksi"
+          title="Koleksi sleepwear LUSE"
+          description="Jelajahi produk yang sudah dipublikasikan admin. Geser foto pada kartu untuk melihat detail produk dari berbagai sisi."
+        />
+      </div>
 
-      <section className="container py-12">
+      <section className="container py-6 sm:py-12">
+        <div className="mb-6 sm:hidden">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-champagne">
+            Koleksi
+          </span>
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-none text-charcoal">
+            Sleepwear LUSE
+          </h1>
+          <p className="mt-2 max-w-sm text-xs leading-5 text-mink">
+            Pilih koleksi, lalu geser kartu untuk melihat produk lainnya.
+          </p>
+        </div>
+
         {loading ? (
           <div className="flex min-h-64 items-center justify-center gap-3 text-mink">
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -133,12 +147,12 @@ export function Collections() {
           </div>
         ) : (
           <>
-            <div className="flex flex-wrap gap-2">
+            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               <button
                 type="button"
                 onClick={() => selectCategory("all")}
                 className={cn(
-                  "rounded-full border px-4 py-2 text-sm font-medium transition",
+                  "shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-medium transition",
                   active === "all"
                     ? "border-champagne bg-champagne/15 text-charcoal"
                     : "border-champagne/25 bg-white/70 text-mink hover:border-champagne/50",
@@ -153,7 +167,7 @@ export function Collections() {
                   type="button"
                   onClick={() => selectCategory(category.id)}
                   className={cn(
-                    "rounded-full border px-4 py-2 text-sm font-medium transition",
+                    "shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-medium transition",
                     active === category.id
                       ? "border-champagne bg-champagne/15 text-charcoal"
                       : "border-champagne/25 bg-white/70 text-mink hover:border-champagne/50",
@@ -168,21 +182,28 @@ export function Collections() {
             </div>
 
             {filtered.length === 0 ? (
-              <div className="mt-12 rounded-luxe border border-champagne/15 bg-white/60 p-12 text-center text-mink">
+              <div className="mt-10 rounded-luxe border border-champagne/15 bg-white/60 p-10 text-center text-mink sm:mt-12 sm:p-12">
                 Belum ada produk berstatus approved untuk kategori ini.
               </div>
             ) : (
-              <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              <div
+                aria-label="Daftar produk"
+                className="-mx-4 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pb-5 scroll-px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-2 sm:gap-7 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3"
+              >
                 {filtered.map((product) => (
-                  <ProductCard
+                  <div
                     key={product.id}
-                    product={product}
-                    categoryName={
-                      product.categoryId
-                        ? categoryById.get(product.categoryId) ?? "Koleksi LUSE"
-                        : "Koleksi LUSE"
-                    }
-                  />
+                    className="w-[61vw] min-w-[228px] max-w-[264px] shrink-0 snap-start snap-always sm:w-auto sm:min-w-0 sm:max-w-none"
+                  >
+                    <ProductCard
+                      product={product}
+                      categoryName={
+                        product.categoryId
+                          ? categoryById.get(product.categoryId) ?? "Koleksi LUSE"
+                          : "Koleksi LUSE"
+                      }
+                    />
+                  </div>
                 ))}
               </div>
             )}
