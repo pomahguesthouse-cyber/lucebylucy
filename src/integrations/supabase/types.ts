@@ -134,6 +134,65 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          base_price: number
+          best_for: string | null
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          image_color: string
+          image_url: string | null
+          name: string
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number
+          best_for?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_color?: string
+          image_url?: string | null
+          name: string
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          best_for?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_color?: string
+          image_url?: string | null
+          name?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "collection_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
