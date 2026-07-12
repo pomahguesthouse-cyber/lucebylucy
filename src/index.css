@@ -28,6 +28,10 @@
     font-family: "Cormorant Garamond", Georgia, serif;
   }
 
+  .input {
+    @apply w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none transition focus:border-champagne focus:ring-2 focus:ring-champagne/15;
+  }
+
   /* Animasi reveal saat scroll */
   [data-reveal] {
     opacity: 0;
