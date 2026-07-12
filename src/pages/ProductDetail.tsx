@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ImageOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/layout/SiteLayout";
+import { ProductImageSlider } from "@/components/products/ProductImageSlider";
 import { Button } from "@/components/ui/button";
 import {
   fetchActiveCategories,
@@ -19,7 +20,6 @@ export function ProductDetail() {
   const [categories, setCategories] = useState<CollectionCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,19 +124,19 @@ export function ProductDetail() {
         </Link>
 
         <div className="mt-6 grid gap-10 lg:grid-cols-2">
-          <div
-            className="flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-luxe shadow-soft"
-            style={{ backgroundColor: product.imageColor || "#e6d8c2" }}
-          >
-            {product.imageUrl && !imageFailed ? (
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="h-full w-full object-cover"
-                onError={() => setImageFailed(true)}
-              />
-            ) : (
-              <ImageOff className="h-12 w-12 text-charcoal/30" aria-hidden="true" />
+          <div>
+            <ProductImageSlider
+              images={product.imageUrls}
+              alt={product.name}
+              fallbackColor={product.imageColor}
+              loading="eager"
+              className="aspect-[4/5] w-full rounded-luxe shadow-soft"
+              imageClassName="transition duration-500"
+            />
+            {product.imageUrls.length > 1 && (
+              <p className="mt-3 text-center text-xs text-mink">
+                Geser foto atau gunakan tombol panah untuk melihat {product.imageUrls.length} gambar produk.
+              </p>
             )}
           </div>
 
