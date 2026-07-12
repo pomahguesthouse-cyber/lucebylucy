@@ -5,3 +5,9 @@ dist-ssr
 *.log
 .DS_Store
 .env
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Supabase CLI temporary files
+supabase/.temp/
