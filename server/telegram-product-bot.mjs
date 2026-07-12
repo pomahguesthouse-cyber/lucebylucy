@@ -16,6 +16,7 @@ const POLL_TIMEOUT_SECONDS = Number.parseInt(
 const RETRY_DELAY_MS = 3_000;
 const MAX_CAPTION_LENGTH = 4_096;
 const VALID_STATUSES = new Set(["draft", "approved", "archived"]);
+const PRODUCT_CODE_PATTERN = /^[A-Z0-9][A-Z0-9-]{1,39}$/;
 
 const ADMIN_IDS = new Set(
   (process.env.TELEGRAM_ADMIN_IDS || "")
@@ -103,6 +104,10 @@ const normalizeKey = (value) =>
     .replace(/\s+/g, " ");
 
 const FIELD_ALIASES = new Map([
+  ["kode", "productCode"],
+  ["kode produk", "productCode"],
+  ["product code", "productCode"],
+  ["sku", "productCode"],
   ["nama", "name"],
   ["nama produk", "name"],
   ["produk", "name"],
@@ -160,6 +165,13 @@ function parseProductCaption(rawText) {
     throw new Error("Harga harus berupa angka rupiah yang valid.");
   }
 
+  const productCode = parsed.productCode?.trim().toUpperCase() || null;
+  if (productCode && !PRODUCT_CODE_PATTERN.test(productCode)) {
+    throw new Error(
+      "Kode produk harus 2-40 karakter dan hanya berisi huruf, angka, atau tanda hubung.",
+    );
+  }
+
   let status = normalizeKey(parsed.status || DEFAULT_STATUS);
   if (["publish", "published", "publik", "disetujui"].includes(status)) {
     status = "approved";
@@ -185,6 +197,7 @@ function parseProductCaption(rawText) {
   }
 
   return {
+    productCode,
     name: parsed.name.trim(),
     price,
     category: parsed.category?.trim() || null,
@@ -355,6 +368,7 @@ async function createProductFromMessage(update, message) {
       .from("products")
       .insert({
         slug,
+        ...(input.productCode ? { product_code: input.productCode } : {}),
         name: input.name,
         category_id: categoryId,
         description: input.description,
@@ -366,10 +380,15 @@ async function createProductFromMessage(update, message) {
         sort_order: sortOrder,
         created_by: null,
       })
-      .select("id, name, slug, status, base_price")
+      .select("id, product_code, name, slug, status, base_price")
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === "23505" && error.message?.includes("product_code")) {
+        throw new Error("Kode produk sudah digunakan. Kosongkan Kode agar dibuat otomatis.");
+      }
+      throw error;
+    }
 
     await finishImport(importId, {
       status: "success",
@@ -381,6 +400,7 @@ async function createProductFromMessage(update, message) {
       message.chat.id,
       [
         "✅ <b>Produk berhasil masuk ke database.</b>",
+        `Kode: <code>${escapeHtml(product.product_code)}</code>`,
         `Nama: <b>${escapeHtml(product.name)}</b>`,
         `Harga: Rp${Number(product.base_price).toLocaleString("id-ID")}`,
         `Status: ${escapeHtml(product.status)}`,
@@ -437,6 +457,7 @@ async function handleMessage(update) {
         "Kirim foto produk dengan caption berikut:",
         "",
         "<code>/produk",
+        "Kode: LU-0079 (opsional, kosongkan untuk otomatis)",
         "Nama: Satin Moon Pajama",
         "Harga: 289000",
         "Kategori: pajama-set",
