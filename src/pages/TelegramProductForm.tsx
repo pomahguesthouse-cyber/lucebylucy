@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { CheckCircle2, ImagePlus, Loader2, PackagePlus, Trash2 } from "lucide-react";
 
 type Category = { id: string; name: string };
@@ -39,7 +40,6 @@ const initialForm = {
   description: "",
   basePrice: "",
   imageColor: "#e6d8c2",
-  bestFor: "",
   status: "draft",
 };
 
@@ -106,7 +106,7 @@ export function TelegramProductForm() {
     setCoverImageId("");
   };
 
-  const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files || []);
     event.target.value = "";
     setMessage("");
@@ -200,7 +200,7 @@ export function TelegramProductForm() {
     }
   };
 
-  const submit = async (event: React.FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setMessage("");
 
@@ -285,6 +285,7 @@ export function TelegramProductForm() {
                 maxLength={40}
               />
             </Field>
+
             <Field label="Nama produk">
               <input
                 value={form.name}
@@ -294,6 +295,7 @@ export function TelegramProductForm() {
                 required
               />
             </Field>
+
             <div className="grid grid-cols-2 gap-3">
               <Field label="Harga">
                 <input
@@ -307,6 +309,7 @@ export function TelegramProductForm() {
                   required
                 />
               </Field>
+
               <Field label="Status">
                 <select
                   value={form.status}
@@ -318,6 +321,7 @@ export function TelegramProductForm() {
                 </select>
               </Field>
             </div>
+
             <Field label="Kategori">
               <select
                 value={form.categoryId}
@@ -332,6 +336,7 @@ export function TelegramProductForm() {
                 ))}
               </select>
             </Field>
+
             <Field label="Deskripsi">
               <textarea
                 value={form.description}
@@ -339,14 +344,6 @@ export function TelegramProductForm() {
                 rows={4}
                 placeholder="Detail bahan, potongan, dan keunggulan produk."
                 className="input resize-y"
-              />
-            </Field>
-            <Field label="Cocok untuk">
-              <input
-                value={form.bestFor}
-                onChange={(event) => update("bestFor", event.target.value)}
-                placeholder="Tidur malam dan bersantai"
-                className="input"
               />
             </Field>
 
@@ -461,7 +458,7 @@ export function TelegramProductForm() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-mink">
