@@ -14,6 +14,7 @@ import { Contact } from "@/pages/Contact";
 import { MyDesigns } from "@/pages/MyDesigns";
 import { MyOrders } from "@/pages/MyOrders";
 import { MeasurementProfile } from "@/pages/MeasurementProfile";
+import { TelegramProductForm } from "@/pages/TelegramProductForm";
 import { NotFound } from "@/pages/NotFound";
 import { AdminLogin } from "@/pages/AdminLogin";
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
@@ -31,7 +32,9 @@ import { LuseAssistantWidget } from "@/components/agent/LuseAssistantWidget";
 
 function PublicAssistant() {
   const { pathname } = useLocation();
-  return pathname.startsWith("/admin") ? null : <LuseAssistantWidget />;
+  return pathname.startsWith("/admin") || pathname.startsWith("/telegram") ? null : (
+    <LuseAssistantWidget />
+  );
 }
 
 function App() {
@@ -53,6 +56,7 @@ function App() {
         <Route path="/my-designs" element={<MyDesigns />} />
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/measurements" element={<MeasurementProfile />} />
+        <Route path="/telegram/products/new" element={<TelegramProductForm />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
           path="/admin"
