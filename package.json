@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "telegram:products": "node server/telegram-product-bot.mjs",
-    "telegram:product-api": "node server/telegram-product-api.mjs"
+    "telegram:product-api": "node server/telegram-product-api.mjs",
+    "telegram:setup-miniapp": "node server/setup-telegram-miniapp.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
