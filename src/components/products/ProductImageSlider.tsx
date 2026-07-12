@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,10 @@ interface ProductImageSliderProps {
   className?: string;
   imageClassName?: string;
   loading?: "eager" | "lazy";
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
+  transition?: "instant" | "fade";
+  pauseOnHover?: boolean;
 }
 
 const normalizeImages = (images: string[]) =>
@@ -27,10 +31,15 @@ export function ProductImageSlider({
   className,
   imageClassName,
   loading = "lazy",
+  autoPlay = false,
+  autoPlayInterval = 4000,
+  transition = "instant",
+  pauseOnHover = true,
 }: ProductImageSliderProps) {
   const normalizedImages = useMemo(() => normalizeImages(images), [images]);
   const [failedImages, setFailedImages] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   const availableImages = useMemo(
@@ -47,45 +56,116 @@ export function ProductImageSlider({
     setActiveIndex((current) => Math.min(current, availableImages.length - 1));
   }, [availableImages.length]);
 
-  const move = (direction: -1 | 1) => {
-    if (availableImages.length < 2) return;
-    setActiveIndex((current) =>
-      (current + direction + availableImages.length) % availableImages.length,
+  const move = useCallback(
+    (direction: -1 | 1) => {
+      if (availableImages.length < 2) return;
+      setActiveIndex(
+        (current) =>
+          (current + direction + availableImages.length) % availableImages.length,
+      );
+    },
+    [availableImages.length],
+  );
+
+  useEffect(() => {
+    if (!autoPlay || isPaused || availableImages.length < 2) return;
+
+    const prefersReducedMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) return;
+
+    const intervalId = window.setInterval(
+      () => move(1),
+      Math.max(autoPlayInterval, 1500),
+    );
+
+    return () => window.clearInterval(intervalId);
+  }, [autoPlay, autoPlayInterval, availableImages.length, isPaused, move]);
+
+  const markImageFailed = (image: string) => {
+    setFailedImages((current) =>
+      current.includes(image) ? current : [...current, image],
     );
   };
 
   const activeImage = availableImages[activeIndex];
+  const useFade = transition === "fade" && availableImages.length > 1;
 
   return (
     <div
       className={cn("relative overflow-hidden", className)}
       style={{ backgroundColor: fallbackColor }}
+      onMouseEnter={() => {
+        if (pauseOnHover) setIsPaused(true);
+      }}
+      onMouseLeave={() => {
+        if (pauseOnHover) setIsPaused(false);
+      }}
+      onFocusCapture={() => setIsPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setIsPaused(false);
+        }
+      }}
       onTouchStart={(event) => {
+        setIsPaused(true);
         touchStartX.current = event.touches[0]?.clientX ?? null;
       }}
       onTouchEnd={(event) => {
-        if (touchStartX.current === null) return;
+        if (touchStartX.current === null) {
+          setIsPaused(false);
+          return;
+        }
+
         const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX.current;
         const distance = touchStartX.current - touchEndX;
         touchStartX.current = null;
 
-        if (Math.abs(distance) < 45) return;
-        move(distance > 0 ? 1 : -1);
+        if (Math.abs(distance) >= 45) {
+          move(distance > 0 ? 1 : -1);
+        }
+
+        setIsPaused(false);
       }}
     >
       {activeImage ? (
-        <img
-          key={activeImage}
-          src={activeImage}
-          alt={availableImages.length > 1 ? `${alt} — foto ${activeIndex + 1}` : alt}
-          loading={loading}
-          className={cn("h-full w-full object-cover", imageClassName)}
-          onError={() =>
-            setFailedImages((current) =>
-              current.includes(activeImage) ? current : [...current, activeImage],
-            )
-          }
-        />
+        useFade ? (
+          <div className="relative h-full w-full">
+            {availableImages.map((image, index) => {
+              const isActive = index === activeIndex;
+
+              return (
+                <img
+                  key={image}
+                  src={image}
+                  alt={isActive ? `${alt} — foto ${index + 1}` : ""}
+                  aria-hidden={!isActive}
+                  loading={index === 0 ? loading : "lazy"}
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-cover",
+                    isActive ? "z-[1] opacity-100" : "z-0 opacity-0",
+                    imageClassName,
+                  )}
+                  style={{
+                    transition: "opacity 700ms ease-in-out, transform 700ms ease-out",
+                  }}
+                  onError={() => markImageFailed(image)}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <img
+            key={activeImage}
+            src={activeImage}
+            alt={availableImages.length > 1 ? `${alt} — foto ${activeIndex + 1}` : alt}
+            loading={loading}
+            className={cn("h-full w-full object-cover", imageClassName)}
+            onError={() => markImageFailed(activeImage)}
+          />
+        )
       ) : (
         <div className="grid h-full min-h-64 w-full place-items-center">
           <ImageOff className="h-9 w-9 text-charcoal/30" aria-hidden="true" />
