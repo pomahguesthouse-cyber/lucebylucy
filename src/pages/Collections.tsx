@@ -4,14 +4,9 @@ import { useSearchParams } from "react-router-dom";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { PageHero } from "@/components/layout/PageHero";
 import { ProductCard } from "@/components/products/ProductCard";
-import {
-  fetchActiveCategories,
-  type CollectionCategory,
-} from "@/lib/category-service";
-import {
-  fetchApprovedProducts,
-  type ProductItem,
-} from "@/lib/product-service";
+import type { CollectionCategory } from "@/lib/category-service";
+import type { ProductItem } from "@/lib/product-service";
+import { fetchPublicCatalog } from "@/lib/public-catalog-service";
 import { cn } from "@/lib/utils";
 
 const normalizeCategory = (value: string) =>
@@ -34,10 +29,9 @@ export function Collections() {
     setError(null);
 
     try {
-      const [categoryItems, productItems] = await Promise.all([
-        fetchActiveCategories(),
-        fetchApprovedProducts(),
-      ]);
+      const { categories: categoryItems, products: productItems } =
+        await fetchPublicCatalog();
+
       setCategories(categoryItems);
       setProducts(productItems);
 
