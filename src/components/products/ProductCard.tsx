@@ -35,7 +35,7 @@ export function ProductCard({ product, categoryName }: ProductCardProps) {
         />
 
         <div className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[68%] flex-wrap gap-2 sm:left-4 sm:top-4">
-          <span className="rounded-full bg-white/92 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-charcoal shadow-soft backdrop-blur sm:px-3 sm:py-1.5 sm:text-[10px]">
+          <span className="rounded-full bg-white/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-charcoal shadow-soft backdrop-blur sm:px-3 sm:py-1.5 sm:text-[10px]">
             {categoryName}
           </span>
         </div>
