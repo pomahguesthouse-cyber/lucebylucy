@@ -54,6 +54,13 @@ export interface ProductInput {
 const SELECT_COLUMNS =
   "id, slug, product_code, name, category_id, description, base_price, image_url, image_color, best_for, status, sort_order, created_at, updated_at";
 
+const productsTable = async () => {
+  const supabase = await getBackendClient();
+  // product_code baru ditambahkan oleh migration; cast ini menjaga build tetap berjalan
+  // sampai tipe Supabase diregenerasi dari project remote.
+  return { supabase, table: (supabase as any).from("products") };
+};
+
 const mapProduct = (row: ProductRow): ProductItem => ({
   id: row.id,
   slug: row.slug,
@@ -81,10 +88,9 @@ const slugify = (value: string): string =>
     .replace(/^-+|-+$/g, "");
 
 const createUniqueSlug = async (name: string): Promise<string> => {
-  const supabase = await getBackendClient();
+  const { table } = await productsTable();
   const baseSlug = slugify(name) || `produk-${Date.now()}`;
-  const { data, error } = await supabase
-    .from("products")
+  const { data, error } = await table
     .select("id")
     .eq("slug", baseSlug)
     .maybeSingle();
@@ -107,36 +113,33 @@ const throwProductError = (error: { code?: string; message?: string }): never =>
 };
 
 export const fetchAllProducts = async (): Promise<ProductItem[]> => {
-  const supabase = await getBackendClient();
-  const { data, error } = await supabase
-    .from("products")
+  const { table } = await productsTable();
+  const { data, error } = await table
     .select(SELECT_COLUMNS)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return (data ?? []).map((row) => mapProduct(row as ProductRow));
+  return (data ?? []).map((row: ProductRow) => mapProduct(row));
 };
 
 export const fetchApprovedProducts = async (): Promise<ProductItem[]> => {
-  const supabase = await getBackendClient();
-  const { data, error } = await supabase
-    .from("products")
+  const { table } = await productsTable();
+  const { data, error } = await table
     .select(SELECT_COLUMNS)
     .eq("status", "approved")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return (data ?? []).map((row) => mapProduct(row as ProductRow));
+  return (data ?? []).map((row: ProductRow) => mapProduct(row));
 };
 
 export const fetchApprovedProductById = async (
   id: string,
 ): Promise<ProductItem | null> => {
-  const supabase = await getBackendClient();
-  const { data, error } = await supabase
-    .from("products")
+  const { table } = await productsTable();
+  const { data, error } = await table
     .select(SELECT_COLUMNS)
     .eq("id", id)
     .eq("status", "approved")
@@ -147,7 +150,7 @@ export const fetchApprovedProductById = async (
 };
 
 export const createProduct = async (input: ProductInput): Promise<void> => {
-  const supabase = await getBackendClient();
+  const { supabase, table } = await productsTable();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -156,7 +159,7 @@ export const createProduct = async (input: ProductInput): Promise<void> => {
 
   const slug = await createUniqueSlug(input.name);
   const productCode = normalizeProductCode(input.productCode);
-  const { error } = await supabase.from("products").insert({
+  const { error } = await table.insert({
     slug,
     ...(productCode ? { product_code: productCode } : {}),
     name: input.name.trim(),
@@ -178,9 +181,8 @@ export const updateProduct = async (
   id: string,
   input: ProductInput,
 ): Promise<void> => {
-  const supabase = await getBackendClient();
-  const { error } = await supabase
-    .from("products")
+  const { table } = await productsTable();
+  const { error } = await table
     .update({
       product_code: normalizeProductCode(input.productCode) ?? null,
       name: input.name.trim(),
@@ -199,7 +201,7 @@ export const updateProduct = async (
 };
 
 export const deleteProduct = async (id: string): Promise<void> => {
-  const supabase = await getBackendClient();
-  const { error } = await supabase.from("products").delete().eq("id", id);
+  const { table } = await productsTable();
+  const { error } = await table.delete().eq("id", id);
   if (error) throw error;
 };
