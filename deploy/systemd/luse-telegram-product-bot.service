@@ -1,0 +1,21 @@
+[Unit]
+Description=LUSE Telegram Product Import Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/lusebylucy
+EnvironmentFile=/etc/luse/telegram-product-bot.env
+ExecStart=/usr/bin/node /var/www/lusebylucy/server/telegram-product-bot.mjs
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
