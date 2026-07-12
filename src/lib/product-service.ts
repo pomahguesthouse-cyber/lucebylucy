@@ -13,6 +13,7 @@ export interface ProductItem {
   description: string | null;
   basePrice: number;
   imageUrl: string | null;
+  imageUrls: string[];
   imageColor: string;
   bestFor: string | null;
   status: ProductStatus;
@@ -30,6 +31,7 @@ interface ProductRow {
   description: string | null;
   base_price: number;
   image_url: string | null;
+  image_urls?: string[] | null;
   image_color: string;
   best_for: string | null;
   status: string;
@@ -45,38 +47,60 @@ export interface ProductInput {
   description?: string;
   basePrice: number;
   imageUrl?: string;
+  imageUrls?: string[];
   imageColor?: string;
   bestFor?: string;
   status?: ProductStatus;
   sortOrder?: number;
 }
 
-const SELECT_COLUMNS =
+const LEGACY_SELECT_COLUMNS =
   "id, slug, product_code, name, category_id, description, base_price, image_url, image_color, best_for, status, sort_order, created_at, updated_at";
+const SELECT_COLUMNS = `${LEGACY_SELECT_COLUMNS}, image_urls`;
 
 const productsTable = async () => {
   const supabase = await getBackendClient();
-  // product_code baru ditambahkan oleh migration; cast ini menjaga build tetap berjalan
+  // product_code dan image_urls ditambahkan oleh migration; cast ini menjaga build
   // sampai tipe Supabase diregenerasi dari project remote.
   return { supabase, table: (supabase as any).from("products") };
 };
 
-const mapProduct = (row: ProductRow): ProductItem => ({
-  id: row.id,
-  slug: row.slug,
-  productCode: row.product_code,
-  name: row.name,
-  categoryId: row.category_id,
-  description: row.description,
-  basePrice: Number(row.base_price),
-  imageUrl: row.image_url,
-  imageColor: row.image_color,
-  bestFor: row.best_for,
-  status: row.status as ProductStatus,
-  sortOrder: row.sort_order,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at,
-});
+const normalizeImageUrls = (values: Array<string | null | undefined>): string[] =>
+  Array.from(
+    new Set(
+      values
+        .map((value) => value?.trim() ?? "")
+        .filter(Boolean),
+    ),
+  );
+
+const productImagesFromRow = (row: ProductRow): string[] =>
+  normalizeImageUrls([
+    row.image_url,
+    ...(Array.isArray(row.image_urls) ? row.image_urls : []),
+  ]);
+
+const mapProduct = (row: ProductRow): ProductItem => {
+  const imageUrls = productImagesFromRow(row);
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    productCode: row.product_code,
+    name: row.name,
+    categoryId: row.category_id,
+    description: row.description,
+    basePrice: Number(row.base_price),
+    imageUrl: imageUrls[0] ?? null,
+    imageUrls,
+    imageColor: row.image_color,
+    bestFor: row.best_for,
+    status: row.status as ProductStatus,
+    sortOrder: row.sort_order,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+};
 
 const slugify = (value: string): string =>
   value
@@ -105,6 +129,35 @@ const normalizeProductCode = (value?: string): string | undefined => {
   return normalized || undefined;
 };
 
+const isMissingImageGalleryColumn = (error: { code?: string; message?: string } | null) =>
+  Boolean(
+    error &&
+      (error.code === "42703" ||
+        error.message?.toLowerCase().includes("image_urls")),
+  );
+
+const runProductRead = async (queryFactory: (columns: string) => any) => {
+  let result = await queryFactory(SELECT_COLUMNS);
+  if (isMissingImageGalleryColumn(result.error)) {
+    result = await queryFactory(LEGACY_SELECT_COLUMNS);
+  }
+  return result;
+};
+
+const runProductWrite = async (
+  writeFactory: (payload: Record<string, unknown>) => any,
+  payload: Record<string, unknown>,
+) => {
+  let result = await writeFactory(payload);
+
+  if (isMissingImageGalleryColumn(result.error)) {
+    const { image_urls: _imageUrls, ...legacyPayload } = payload;
+    result = await writeFactory(legacyPayload);
+  }
+
+  return result;
+};
+
 const throwProductError = (error: { code?: string; message?: string }): never => {
   if (error.code === "23505" && error.message?.includes("product_code")) {
     throw new Error("Kode produk sudah digunakan. Gunakan kode lain atau kosongkan agar dibuat otomatis.");
@@ -114,10 +167,12 @@ const throwProductError = (error: { code?: string; message?: string }): never =>
 
 export const fetchAllProducts = async (): Promise<ProductItem[]> => {
   const { table } = await productsTable();
-  const { data, error } = await table
-    .select(SELECT_COLUMNS)
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
+  const { data, error } = await runProductRead((columns) =>
+    table
+      .select(columns)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false }),
+  );
 
   if (error) throw error;
   return (data ?? []).map((row: ProductRow) => mapProduct(row));
@@ -125,11 +180,13 @@ export const fetchAllProducts = async (): Promise<ProductItem[]> => {
 
 export const fetchApprovedProducts = async (): Promise<ProductItem[]> => {
   const { table } = await productsTable();
-  const { data, error } = await table
-    .select(SELECT_COLUMNS)
-    .eq("status", "approved")
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
+  const { data, error } = await runProductRead((columns) =>
+    table
+      .select(columns)
+      .eq("status", "approved")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false }),
+  );
 
   if (error) throw error;
   return (data ?? []).map((row: ProductRow) => mapProduct(row));
@@ -139,11 +196,13 @@ export const fetchApprovedProductById = async (
   id: string,
 ): Promise<ProductItem | null> => {
   const { table } = await productsTable();
-  const { data, error } = await table
-    .select(SELECT_COLUMNS)
-    .eq("id", id)
-    .eq("status", "approved")
-    .maybeSingle();
+  const { data, error } = await runProductRead((columns) =>
+    table
+      .select(columns)
+      .eq("id", id)
+      .eq("status", "approved")
+      .maybeSingle(),
+  );
 
   if (error) throw error;
   return data ? mapProduct(data as ProductRow) : null;
@@ -159,21 +218,27 @@ export const createProduct = async (input: ProductInput): Promise<void> => {
 
   const slug = await createUniqueSlug(input.name);
   const productCode = normalizeProductCode(input.productCode);
-  const { error } = await table.insert({
+  const imageUrls = normalizeImageUrls([
+    ...(input.imageUrls ?? []),
+    input.imageUrl,
+  ]);
+  const payload = {
     slug,
     ...(productCode ? { product_code: productCode } : {}),
     name: input.name.trim(),
     category_id: input.categoryId || null,
     description: input.description?.trim() || null,
     base_price: input.basePrice,
-    image_url: input.imageUrl?.trim() || null,
+    image_url: imageUrls[0] ?? null,
+    image_urls: imageUrls,
     image_color: input.imageColor || "#e6d8c2",
     best_for: input.bestFor?.trim() || null,
     status: input.status ?? "draft",
     sort_order: input.sortOrder ?? 0,
     created_by: user.id,
-  });
+  };
 
+  const { error } = await runProductWrite((values) => table.insert(values), payload);
   if (error) throwProductError(error);
 };
 
@@ -182,21 +247,28 @@ export const updateProduct = async (
   input: ProductInput,
 ): Promise<void> => {
   const { table } = await productsTable();
-  const { error } = await table
-    .update({
-      product_code: normalizeProductCode(input.productCode) ?? null,
-      name: input.name.trim(),
-      category_id: input.categoryId || null,
-      description: input.description?.trim() || null,
-      base_price: input.basePrice,
-      image_url: input.imageUrl?.trim() || null,
-      image_color: input.imageColor || "#e6d8c2",
-      best_for: input.bestFor?.trim() || null,
-      status: input.status ?? "draft",
-      sort_order: input.sortOrder ?? 0,
-    })
-    .eq("id", id);
+  const imageUrls = normalizeImageUrls([
+    ...(input.imageUrls ?? []),
+    input.imageUrl,
+  ]);
+  const payload = {
+    product_code: normalizeProductCode(input.productCode) ?? null,
+    name: input.name.trim(),
+    category_id: input.categoryId || null,
+    description: input.description?.trim() || null,
+    base_price: input.basePrice,
+    image_url: imageUrls[0] ?? null,
+    image_urls: imageUrls,
+    image_color: input.imageColor || "#e6d8c2",
+    best_for: input.bestFor?.trim() || null,
+    status: input.status ?? "draft",
+    sort_order: input.sortOrder ?? 0,
+  };
 
+  const { error } = await runProductWrite(
+    (values) => table.update(values).eq("id", id),
+    payload,
+  );
   if (error) throwProductError(error);
 };
 

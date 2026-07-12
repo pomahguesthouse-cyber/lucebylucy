@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertCircle, ImageOff, Loader2 } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { PageHero } from "@/components/layout/PageHero";
+import { ProductCard } from "@/components/products/ProductCard";
 import {
   fetchActiveCategories,
   type CollectionCategory,
@@ -11,33 +12,7 @@ import {
   fetchApprovedProducts,
   type ProductItem,
 } from "@/lib/product-service";
-import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-function ProductImage({ product }: { product: ProductItem }) {
-  const [failed, setFailed] = useState(false);
-
-  if (!product.imageUrl || failed) {
-    return (
-      <div
-        className="flex h-64 w-full items-center justify-center"
-        style={{ backgroundColor: product.imageColor || "#e6d8c2" }}
-      >
-        <ImageOff className="h-8 w-8 text-charcoal/35" aria-hidden="true" />
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={product.imageUrl}
-      alt={product.name}
-      loading="lazy"
-      className="h-64 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-      onError={() => setFailed(true)}
-    />
-  );
-}
 
 const normalizeCategory = (value: string) =>
   value
@@ -134,7 +109,7 @@ export function Collections() {
       <PageHero
         eyebrow="Koleksi"
         title="Koleksi sleepwear LUSE"
-        description="Jelajahi produk yang sudah dipublikasikan admin. Foto, kode, harga, kategori, dan deskripsi ditampilkan langsung dari database LUSE."
+        description="Jelajahi produk yang sudah dipublikasikan admin. Geser foto pada kartu untuk melihat detail produk dari berbagai sisi."
       />
 
       <section className="container py-12">
@@ -197,43 +172,17 @@ export function Collections() {
                 Belum ada produk berstatus approved untuk kategori ini.
               </div>
             ) : (
-              <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((product) => (
-                  <Link
+                  <ProductCard
                     key={product.id}
-                    to={`/products/${product.id}`}
-                    className="group overflow-hidden rounded-luxe border border-champagne/15 bg-white/75 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-luxe"
-                  >
-                    <div className="overflow-hidden">
-                      <ProductImage product={product} />
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-champagne">
-                          {product.categoryId
-                            ? categoryById.get(product.categoryId) ?? "Koleksi LUSE"
-                            : "Koleksi LUSE"}
-                        </p>
-                        <span className="rounded-md bg-champagne/10 px-2 py-1 font-mono text-[11px] font-semibold text-charcoal">
-                          {product.productCode}
-                        </span>
-                      </div>
-                      <h3 className="mt-2 font-display text-xl font-semibold text-charcoal">
-                        {product.name}
-                      </h3>
-                      <p className="mt-2 line-clamp-2 min-h-10 text-sm text-mink">
-                        {product.description || "Produk sleepwear pilihan LUSE by Lucy."}
-                      </p>
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <span className="text-base font-semibold text-champagne">
-                          {formatPrice(product.basePrice)}
-                        </span>
-                        <span className="text-xs font-medium text-champagne group-hover:underline">
-                          Lihat detail →
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
+                    product={product}
+                    categoryName={
+                      product.categoryId
+                        ? categoryById.get(product.categoryId) ?? "Koleksi LUSE"
+                        : "Koleksi LUSE"
+                    }
+                  />
                 ))}
               </div>
             )}
