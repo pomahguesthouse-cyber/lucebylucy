@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ImageOff, Images, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { ProductImageManager } from "@/components/products/ProductImageManager";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatPrice } from "@/lib/format";
@@ -64,12 +65,18 @@ const isValidImageUrl = (value: string): boolean => {
   }
 };
 
+const putCoverFirst = (imageUrls: string[], coverUrl: string): string[] => {
+  if (!coverUrl || !imageUrls.includes(coverUrl)) return imageUrls;
+  return [coverUrl, ...imageUrls.filter((imageUrl) => imageUrl !== coverUrl)];
+};
+
 export function AdminProducts() {
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [categories, setCategories] = useState<CollectionCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState("");
   const [form, setForm] = useState<ProductFormState>(emptyForm);
 
   const categoryNameById = useMemo(
@@ -99,11 +106,13 @@ export function AdminProducts() {
 
   const resetForm = () => {
     setEditingId(null);
+    setCoverImageUrl("");
     setForm(emptyForm);
   };
 
   const startEdit = (product: ProductItem) => {
     setEditingId(product.id);
+    setCoverImageUrl(product.imageUrls[0] ?? "");
     setForm({
       productCode: product.productCode,
       name: product.name,
@@ -139,13 +148,14 @@ export function AdminProducts() {
       return;
     }
 
-    const imageUrls = parseImageUrls(form.imageUrls);
-    const invalidImageUrl = imageUrls.find((imageUrl) => !isValidImageUrl(imageUrl));
+    const parsedImages = parseImageUrls(form.imageUrls);
+    const invalidImageUrl = parsedImages.find((imageUrl) => !isValidImageUrl(imageUrl));
     if (invalidImageUrl) {
       toast.error(`URL gambar tidak valid: ${invalidImageUrl}`);
       return;
     }
 
+    const imageUrls = putCoverFirst(parsedImages, coverImageUrl);
     const parsedSortOrder = Number.parseInt(form.sortOrder, 10);
     const sortOrder = Number.isNaN(parsedSortOrder) ? products.length * 10 : parsedSortOrder;
 
@@ -201,7 +211,7 @@ export function AdminProducts() {
   return (
     <AdminLayout
       title="Products"
-      description="Kelola kode, produk, harga, kategori, galeri gambar, dan status publikasi."
+      description="Kelola kode, produk, harga, kategori, galeri gambar, cover, dan status publikasi."
     >
       <form
         onSubmit={handleSubmit}
@@ -322,22 +332,16 @@ export function AdminProducts() {
             />
           </div>
 
-          <div className="md:col-span-2 xl:col-span-3">
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">
-              URL gambar produk
-            </label>
-            <textarea
+          <div className="md:col-span-2 xl:col-span-4">
+            <ProductImageManager
               value={form.imageUrls}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, imageUrls: event.target.value }))
+              coverUrl={coverImageUrl}
+              disabled={saving}
+              onChange={(imageUrls) =>
+                setForm((current) => ({ ...current, imageUrls }))
               }
-              rows={4}
-              className="mt-1 w-full resize-y rounded-xl border border-champagne/25 bg-white px-4 py-3 font-mono text-xs leading-5 outline-none focus:border-champagne"
-              placeholder={"https://.../foto-depan.jpg\nhttps://.../foto-belakang.jpg\nhttps://.../foto-detail.jpg"}
+              onCoverChange={setCoverImageUrl}
             />
-            <p className="mt-1 text-[11px] text-mink">
-              Satu URL per baris. Foto pertama menjadi cover; semua foto tampil sebagai slider di kartu produk.
-            </p>
           </div>
 
           <div>
@@ -390,11 +394,17 @@ export function AdminProducts() {
           <div className="flex items-end">
             <Button type="submit" variant="gold" className="w-full" disabled={saving}>
               {saving ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Menyimpan…</>
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Menyimpan…
+                </>
               ) : editingId ? (
-                <><Pencil className="h-4 w-4" /> Simpan perubahan</>
+                <>
+                  <Pencil className="h-4 w-4" /> Simpan perubahan
+                </>
               ) : (
-                <><Plus className="h-4 w-4" /> Tambah produk</>
+                <>
+                  <Plus className="h-4 w-4" /> Tambah produk
+                </>
               )}
             </Button>
           </div>
@@ -437,7 +447,11 @@ export function AdminProducts() {
                         style={{ backgroundColor: product.imageColor }}
                       >
                         {product.imageUrls[0] ? (
-                          <img src={product.imageUrls[0]} alt={product.name} className="h-full w-full object-cover" />
+                          <img
+                            src={product.imageUrls[0]}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <ImageOff className="h-4 w-4 text-charcoal/35" />
                         )}
@@ -465,13 +479,20 @@ export function AdminProducts() {
                   <td className="px-4 py-3 font-semibold text-champagne">
                     {formatPrice(product.basePrice)}
                   </td>
-                  <td className="px-4 py-3"><StatusBadge status={product.status} /></td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={product.status} />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <Button type="button" size="sm" variant="outline" onClick={() => startEdit(product)}>
                         <Pencil className="h-3.5 w-3.5" /> Edit
                       </Button>
-                      <Button type="button" size="sm" variant="outline" onClick={() => void handleDelete(product)}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void handleDelete(product)}
+                      >
                         <Trash2 className="h-3.5 w-3.5" /> Hapus
                       </Button>
                     </div>
