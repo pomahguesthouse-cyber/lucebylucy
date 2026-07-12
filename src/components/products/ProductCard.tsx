@@ -20,7 +20,11 @@ export function ProductCard({ product, categoryName }: ProductCardProps) {
           alt={product.name}
           fallbackColor={product.imageColor}
           className="aspect-[4/5] w-full"
-          imageClassName="transition duration-700 group-hover:scale-[1.025]"
+          imageClassName="group-hover:scale-[1.025]"
+          autoPlay
+          autoPlayInterval={4200}
+          transition="fade"
+          pauseOnHover
         />
 
         <Link
