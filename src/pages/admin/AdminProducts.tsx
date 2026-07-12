@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ImageOff, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { ImageOff, Images, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ interface ProductFormState {
   categoryId: string;
   description: string;
   basePrice: string;
-  imageUrl: string;
+  imageUrls: string;
   imageColor: string;
   bestFor: string;
   status: ProductStatus;
@@ -34,7 +34,7 @@ const emptyForm: ProductFormState = {
   categoryId: "",
   description: "",
   basePrice: "",
-  imageUrl: "",
+  imageUrls: "",
   imageColor: "#e6d8c2",
   bestFor: "",
   status: "draft",
@@ -42,6 +42,27 @@ const emptyForm: ProductFormState = {
 };
 
 const PRODUCT_CODE_PATTERN = /^[A-Z0-9][A-Z0-9-]{1,39}$/;
+
+const parseImageUrls = (value: string): string[] =>
+  Array.from(
+    new Set(
+      value
+        .split(/[\n,]+/)
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ),
+  );
+
+const isValidImageUrl = (value: string): boolean => {
+  if (value.startsWith("/")) return true;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
 
 export function AdminProducts() {
   const [products, setProducts] = useState<ProductItem[]>([]);
@@ -89,7 +110,7 @@ export function AdminProducts() {
       categoryId: product.categoryId ?? "",
       description: product.description ?? "",
       basePrice: String(product.basePrice),
-      imageUrl: product.imageUrl ?? "",
+      imageUrls: product.imageUrls.join("\n"),
       imageColor: product.imageColor || "#e6d8c2",
       bestFor: product.bestFor ?? "",
       status: product.status,
@@ -118,6 +139,13 @@ export function AdminProducts() {
       return;
     }
 
+    const imageUrls = parseImageUrls(form.imageUrls);
+    const invalidImageUrl = imageUrls.find((imageUrl) => !isValidImageUrl(imageUrl));
+    if (invalidImageUrl) {
+      toast.error(`URL gambar tidak valid: ${invalidImageUrl}`);
+      return;
+    }
+
     const parsedSortOrder = Number.parseInt(form.sortOrder, 10);
     const sortOrder = Number.isNaN(parsedSortOrder) ? products.length * 10 : parsedSortOrder;
 
@@ -129,7 +157,7 @@ export function AdminProducts() {
         categoryId: form.categoryId || null,
         description: form.description,
         basePrice,
-        imageUrl: form.imageUrl,
+        imageUrls,
         imageColor: form.imageColor,
         bestFor: form.bestFor,
         status: form.status,
@@ -173,7 +201,7 @@ export function AdminProducts() {
   return (
     <AdminLayout
       title="Products"
-      description="Kelola kode, produk, harga, kategori, gambar, dan status publikasi."
+      description="Kelola kode, produk, harga, kategori, galeri gambar, dan status publikasi."
     >
       <form
         onSubmit={handleSubmit}
@@ -185,7 +213,7 @@ export function AdminProducts() {
               {editingId ? "Edit produk" : "Tambah produk"}
             </h2>
             <p className="mt-1 text-xs text-mink">
-              Kosongkan kode saat membuat produk agar sistem menghasilkan LU-0001, LU-0002, dan seterusnya.
+              Kosongkan kode agar sistem menghasilkan LU-0001, LU-0002, dan seterusnya.
             </p>
           </div>
           {editingId && (
@@ -214,7 +242,7 @@ export function AdminProducts() {
               placeholder="Otomatis, contoh LU-0079"
             />
             <p className="mt-1 text-[11px] text-mink">
-              Opsional. Custom: LUSE-SATIN-01, PYJ-2026-08, dan sejenisnya.
+              Opsional. Custom: LUSE-SATIN-01 atau PYJ-2026-08.
             </p>
           </div>
 
@@ -294,17 +322,22 @@ export function AdminProducts() {
             />
           </div>
 
-          <div className="md:col-span-2">
-            <label className="text-xs font-medium uppercase tracking-wide text-mink">URL gambar</label>
-            <input
-              type="url"
-              value={form.imageUrl}
+          <div className="md:col-span-2 xl:col-span-3">
+            <label className="text-xs font-medium uppercase tracking-wide text-mink">
+              URL gambar produk
+            </label>
+            <textarea
+              value={form.imageUrls}
               onChange={(event) =>
-                setForm((current) => ({ ...current, imageUrl: event.target.value }))
+                setForm((current) => ({ ...current, imageUrls: event.target.value }))
               }
-              className="mt-1 w-full rounded-xl border border-champagne/25 bg-white px-4 py-3 text-sm outline-none focus:border-champagne"
-              placeholder="https://..."
+              rows={4}
+              className="mt-1 w-full resize-y rounded-xl border border-champagne/25 bg-white px-4 py-3 font-mono text-xs leading-5 outline-none focus:border-champagne"
+              placeholder={"https://.../foto-depan.jpg\nhttps://.../foto-belakang.jpg\nhttps://.../foto-detail.jpg"}
             />
+            <p className="mt-1 text-[11px] text-mink">
+              Satu URL per baris. Foto pertama menjadi cover; semua foto tampil sebagai slider di kartu produk.
+            </p>
           </div>
 
           <div>
@@ -403,14 +436,21 @@ export function AdminProducts() {
                         className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-xl border border-champagne/15"
                         style={{ backgroundColor: product.imageColor }}
                       >
-                        {product.imageUrl ? (
-                          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                        {product.imageUrls[0] ? (
+                          <img src={product.imageUrls[0]} alt={product.name} className="h-full w-full object-cover" />
                         ) : (
                           <ImageOff className="h-4 w-4 text-charcoal/35" />
                         )}
                       </div>
-                      <div>
-                        <p className="font-medium text-charcoal">{product.name}</p>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium text-charcoal">{product.name}</p>
+                          {product.imageUrls.length > 1 && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-champagne/10 px-2 py-0.5 text-[10px] font-semibold text-champagne">
+                              <Images className="h-3 w-3" /> {product.imageUrls.length} foto
+                            </span>
+                          )}
+                        </div>
                         <p className="mt-0.5 max-w-md truncate text-xs text-mink">
                           {product.description || product.slug}
                         </p>
