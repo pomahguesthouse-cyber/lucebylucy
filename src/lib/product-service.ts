@@ -7,6 +7,7 @@ export type ProductStatus = "draft" | "approved" | "archived";
 export interface ProductItem {
   id: string;
   slug: string;
+  productCode: string;
   name: string;
   categoryId: string | null;
   description: string | null;
@@ -23,6 +24,7 @@ export interface ProductItem {
 interface ProductRow {
   id: string;
   slug: string;
+  product_code: string;
   name: string;
   category_id: string | null;
   description: string | null;
@@ -38,6 +40,7 @@ interface ProductRow {
 
 export interface ProductInput {
   name: string;
+  productCode?: string;
   categoryId?: string | null;
   description?: string;
   basePrice: number;
@@ -49,11 +52,12 @@ export interface ProductInput {
 }
 
 const SELECT_COLUMNS =
-  "id, slug, name, category_id, description, base_price, image_url, image_color, best_for, status, sort_order, created_at, updated_at";
+  "id, slug, product_code, name, category_id, description, base_price, image_url, image_color, best_for, status, sort_order, created_at, updated_at";
 
 const mapProduct = (row: ProductRow): ProductItem => ({
   id: row.id,
   slug: row.slug,
+  productCode: row.product_code,
   name: row.name,
   categoryId: row.category_id,
   description: row.description,
@@ -88,6 +92,18 @@ const createUniqueSlug = async (name: string): Promise<string> => {
   if (error) throw error;
   if (!data) return baseSlug;
   return `${baseSlug}-${crypto.randomUUID().slice(0, 8)}`;
+};
+
+const normalizeProductCode = (value?: string): string | undefined => {
+  const normalized = value?.trim().toUpperCase();
+  return normalized || undefined;
+};
+
+const throwProductError = (error: { code?: string; message?: string }): never => {
+  if (error.code === "23505" && error.message?.includes("product_code")) {
+    throw new Error("Kode produk sudah digunakan. Gunakan kode lain atau kosongkan agar dibuat otomatis.");
+  }
+  throw error;
 };
 
 export const fetchAllProducts = async (): Promise<ProductItem[]> => {
@@ -139,8 +155,10 @@ export const createProduct = async (input: ProductInput): Promise<void> => {
   if (!user) throw new Error("Sesi tidak ditemukan. Silakan masuk kembali.");
 
   const slug = await createUniqueSlug(input.name);
+  const productCode = normalizeProductCode(input.productCode);
   const { error } = await supabase.from("products").insert({
     slug,
+    ...(productCode ? { product_code: productCode } : {}),
     name: input.name.trim(),
     category_id: input.categoryId || null,
     description: input.description?.trim() || null,
@@ -153,7 +171,7 @@ export const createProduct = async (input: ProductInput): Promise<void> => {
     created_by: user.id,
   });
 
-  if (error) throw error;
+  if (error) throwProductError(error);
 };
 
 export const updateProduct = async (
@@ -164,6 +182,7 @@ export const updateProduct = async (
   const { error } = await supabase
     .from("products")
     .update({
+      product_code: normalizeProductCode(input.productCode) ?? null,
       name: input.name.trim(),
       category_id: input.categoryId || null,
       description: input.description?.trim() || null,
@@ -176,7 +195,7 @@ export const updateProduct = async (
     })
     .eq("id", id);
 
-  if (error) throw error;
+  if (error) throwProductError(error);
 };
 
 export const deleteProduct = async (id: string): Promise<void> => {
