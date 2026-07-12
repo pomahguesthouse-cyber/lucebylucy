@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "telegram:products": "node server/telegram-product-bot.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
