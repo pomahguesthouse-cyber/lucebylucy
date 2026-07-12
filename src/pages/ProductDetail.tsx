@@ -141,9 +141,14 @@ export function ProductDetail() {
           </div>
 
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-champagne">
-              {categoryName}
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-champagne">
+                {categoryName}
+              </span>
+              <span className="rounded-md bg-champagne/10 px-2.5 py-1 font-mono text-xs font-semibold text-charcoal">
+                {product.productCode}
+              </span>
+            </div>
             <h1 className="mt-2 font-display text-3xl font-semibold text-charcoal sm:text-4xl">
               {product.name}
             </h1>
@@ -158,7 +163,7 @@ export function ProductDetail() {
             )}
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/contact">
+              <Link to={`/contact?product=${encodeURIComponent(product.productCode)}`}>
                 <Button variant="gold" size="lg">
                   Tanya produk ini
                 </Button>
@@ -171,8 +176,8 @@ export function ProductDetail() {
             </div>
 
             <p className="mt-6 text-xs text-mink">
-              Harga, foto, dan informasi produk ditampilkan langsung dari database LUSE.
-              Ketersediaan stok dapat dikonfirmasi melalui admin.
+              Sebutkan kode <strong>{product.productCode}</strong> saat menghubungi admin agar produk
+              lebih cepat ditemukan. Harga, foto, dan informasi ditampilkan langsung dari database LUSE.
             </p>
           </div>
         </div>
