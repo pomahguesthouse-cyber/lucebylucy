@@ -115,6 +115,21 @@ export const fetchApprovedProducts = async (): Promise<ProductItem[]> => {
   return (data ?? []).map((row) => mapProduct(row as ProductRow));
 };
 
+export const fetchApprovedProductById = async (
+  id: string,
+): Promise<ProductItem | null> => {
+  const supabase = await getBackendClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select(SELECT_COLUMNS)
+    .eq("id", id)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  if (error) throw error;
+  return data ? mapProduct(data as ProductRow) : null;
+};
+
 export const createProduct = async (input: ProductInput): Promise<void> => {
   const supabase = await getBackendClient();
   const {
