@@ -134,7 +134,7 @@ export function Collections() {
       <PageHero
         eyebrow="Koleksi"
         title="Koleksi sleepwear LUSE"
-        description="Jelajahi produk yang sudah dipublikasikan admin. Foto, harga, kategori, dan deskripsi ditampilkan langsung dari database LUSE."
+        description="Jelajahi produk yang sudah dipublikasikan admin. Foto, kode, harga, kategori, dan deskripsi ditampilkan langsung dari database LUSE."
       />
 
       <section className="container py-12">
@@ -208,12 +208,17 @@ export function Collections() {
                       <ProductImage product={product} />
                     </div>
                     <div className="p-5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-champagne">
-                        {product.categoryId
-                          ? categoryById.get(product.categoryId) ?? "Koleksi LUSE"
-                          : "Koleksi LUSE"}
-                      </p>
-                      <h3 className="mt-1 font-display text-xl font-semibold text-charcoal">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-champagne">
+                          {product.categoryId
+                            ? categoryById.get(product.categoryId) ?? "Koleksi LUSE"
+                            : "Koleksi LUSE"}
+                        </p>
+                        <span className="rounded-md bg-champagne/10 px-2 py-1 font-mono text-[11px] font-semibold text-charcoal">
+                          {product.productCode}
+                        </span>
+                      </div>
+                      <h3 className="mt-2 font-display text-xl font-semibold text-charcoal">
                         {product.name}
                       </h3>
                       <p className="mt-2 line-clamp-2 min-h-10 text-sm text-mink">
