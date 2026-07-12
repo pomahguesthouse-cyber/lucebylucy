@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "telegram:products": "node server/telegram-product-bot.mjs"
+    "telegram:products": "node server/telegram-product-bot.mjs",
+    "telegram:product-api": "node server/telegram-product-api.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
