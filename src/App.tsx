@@ -27,12 +27,15 @@ import { AdminHeroMedia } from "@/pages/admin/AdminHeroMedia";
 import { AdminOrders } from "@/pages/admin/AdminOrders";
 import { AdminProductionNotes } from "@/pages/admin/AdminProductionNotes";
 import { AdminSettings } from "@/pages/admin/AdminSettings";
+import { TelegramProductForm } from "@/pages/TelegramProductForm";
 import { LuseAssistantWidget } from "@/components/agent/LuseAssistantWidget";
 
 function PublicAssistant() {
   const { pathname } = useLocation();
-  return pathname.startsWith("/admin") ? null : <LuseAssistantWidget />;
+  return pathname.startsWith("/admin") || pathname.startsWith("/telegram") ? null : <LuseAssistantWidget />;
 }
+
+const protect = (element: React.ReactNode) => <RequireAdmin>{element}</RequireAdmin>;
 
 function App() {
   return (
@@ -53,95 +56,19 @@ function App() {
         <Route path="/my-designs" element={<MyDesigns />} />
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/measurements" element={<MeasurementProfile />} />
+        <Route path="/telegram/products/new" element={<TelegramProductForm />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route
-          path="/admin"
-          element={
-            <RequireAdmin>
-              <AdminDashboard />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/design-requests"
-          element={
-            <RequireAdmin>
-              <AdminDesignRequests />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/categories"
-          element={
-            <RequireAdmin>
-              <AdminCategories />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/products"
-          element={
-            <RequireAdmin>
-              <AdminProducts />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/fabrics"
-          element={
-            <RequireAdmin>
-              <AdminFabrics />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/colors"
-          element={
-            <RequireAdmin>
-              <AdminColors />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/media"
-          element={
-            <RequireAdmin>
-              <AdminMedia />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/video-hero"
-          element={
-            <RequireAdmin>
-              <AdminHeroMedia />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/orders"
-          element={
-            <RequireAdmin>
-              <AdminOrders />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/production-notes"
-          element={
-            <RequireAdmin>
-              <AdminProductionNotes />
-            </RequireAdmin>
-          }
-        />
-        <Route
-          path="/admin/settings"
-          element={
-            <RequireAdmin>
-              <AdminSettings />
-            </RequireAdmin>
-          }
-        />
+        <Route path="/admin" element={protect(<AdminDashboard />)} />
+        <Route path="/admin/design-requests" element={protect(<AdminDesignRequests />)} />
+        <Route path="/admin/categories" element={protect(<AdminCategories />)} />
+        <Route path="/admin/products" element={protect(<AdminProducts />)} />
+        <Route path="/admin/fabrics" element={protect(<AdminFabrics />)} />
+        <Route path="/admin/colors" element={protect(<AdminColors />)} />
+        <Route path="/admin/media" element={protect(<AdminMedia />)} />
+        <Route path="/admin/video-hero" element={protect(<AdminHeroMedia />)} />
+        <Route path="/admin/orders" element={protect(<AdminOrders />)} />
+        <Route path="/admin/production-notes" element={protect(<AdminProductionNotes />)} />
+        <Route path="/admin/settings" element={protect(<AdminSettings />)} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
