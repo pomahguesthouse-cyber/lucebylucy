@@ -1,5 +1,8 @@
 -- Tambahkan kode produk unik yang dapat dibuat otomatis atau diisi manual.
 
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS product_code text;
+
 CREATE SEQUENCE IF NOT EXISTS public.product_code_seq START WITH 1 INCREMENT BY 1;
 
 CREATE OR REPLACE FUNCTION public.generate_product_code()
@@ -26,9 +29,6 @@ $$;
 
 REVOKE ALL ON FUNCTION public.generate_product_code() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.generate_product_code() TO authenticated, service_role;
-
-ALTER TABLE public.products
-  ADD COLUMN IF NOT EXISTS product_code text;
 
 UPDATE public.products
 SET product_code = public.generate_product_code()
