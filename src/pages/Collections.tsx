@@ -106,13 +106,27 @@ export function Collections() {
 
   return (
     <SiteLayout>
-      <PageHero
-        eyebrow="Koleksi"
-        title="Koleksi sleepwear LUSE"
-        description="Jelajahi produk yang sudah dipublikasikan admin. Geser foto pada kartu untuk melihat detail produk dari berbagai sisi."
-      />
+      <div className="hidden sm:block">
+        <PageHero
+          eyebrow="Koleksi"
+          title="Koleksi sleepwear LUSE"
+          description="Jelajahi produk yang sudah dipublikasikan admin. Geser foto pada kartu untuk melihat detail produk dari berbagai sisi."
+        />
+      </div>
 
-      <section className="container py-7 sm:py-12">
+      <section className="container py-6 sm:py-12">
+        <div className="mb-6 sm:hidden">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-champagne">
+            Koleksi
+          </span>
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-none text-charcoal">
+            Sleepwear LUSE
+          </h1>
+          <p className="mt-2 max-w-sm text-xs leading-5 text-mink">
+            Pilih koleksi, lalu geser kartu untuk melihat produk lainnya.
+          </p>
+        </div>
+
         {loading ? (
           <div className="flex min-h-64 items-center justify-center gap-3 text-mink">
             <Loader2 className="h-5 w-5 animate-spin" />
