@@ -4,9 +4,9 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type BackendClient = SupabaseClient<Database>;
 
-const FALLBACK_BACKEND_URL = "https://dotifvezrmxynsnktedy.supabase.co";
+const FALLBACK_BACKEND_URL = "https://rmcxstkchxdzubekgolk.supabase.co";
 const FALLBACK_BACKEND_PUBLISHABLE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdGlmdmV6cm14eW5zbmt0ZWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNDI3MzgsImV4cCI6MjA5NzcxODczOH0._JpMJuqcmsVJBwudYODIGR44_c4R9TSirXwEvD5ophY";
+  "sb_publishable_4q24JSBJOX-qevzBMFpMtg_3_vG2FAT";
 
 const getBackendConfig = () => ({
   url: import.meta.env.VITE_SUPABASE_URL || FALLBACK_BACKEND_URL,
