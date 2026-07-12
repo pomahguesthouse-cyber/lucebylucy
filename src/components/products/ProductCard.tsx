@@ -13,7 +13,7 @@ export function ProductCard({ product, categoryName }: ProductCardProps) {
   const detailUrl = `/products/${product.id}`;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-champagne/15 bg-white/85 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-luxe sm:rounded-[28px]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-champagne/15 bg-white/90 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-luxe sm:rounded-[28px]">
       <div className="relative">
         <ProductImageSlider
           images={product.imageUrls}
